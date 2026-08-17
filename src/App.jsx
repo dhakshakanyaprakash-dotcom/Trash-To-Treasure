@@ -1,0 +1,1695 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  storage 
+} from './utils/storage';
+import { 
+  MapPin, 
+  User, 
+  ShoppingBag, 
+  ShoppingCart, 
+  Heart, 
+  MessageSquare, 
+  Bookmark, 
+  PlusCircle, 
+  CheckCircle, 
+  Award, 
+  ArrowLeft, 
+  Clock, 
+  DollarSign, 
+  Star, 
+  Image as ImageIcon,
+  BookOpen,
+  Calendar,
+  ChevronRight,
+  Upload,
+  Globe
+} from 'lucide-react';
+import './App.css';
+
+function App() {
+  // Navigation & Router
+  const [view, setView] = useState({ name: 'feed', params: null });
+  const [currentUser, setCurrentUser] = useState(null);
+  
+  // Data States (loaded from localStorage on mount & changes)
+  const [artisans, setArtisans] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [follows, setFollows] = useState([]);
+  const [cart, setCart] = useState([]);
+  
+  // Filtering & Search
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  
+  // Modal / Form States
+  const [commentInput, setCommentInput] = useState('');
+  const [activePostCommentsId, setActivePostCommentsId] = useState(null);
+  const [reviewFormOrderId, setReviewFormOrderId] = useState(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewText, setReviewText] = useState('');
+  const [reviewImage, setReviewImage] = useState('');
+  
+  // Artisan Form States
+  const [newProduct, setNewProduct] = useState({
+    title: '', description: '', price: '', stock: '', category: 'Pottery',
+    materials: '', timeToCreate: '', craftTechnique: '', image1: '', image2: '', isMadeToOrder: false
+  });
+  const [newPost, setNewPost] = useState({
+    type: 'photo', mediaUrl: '', caption: '', craftStory: '', linkedProductId: '',
+    diaryEntries: [{ dayNumber: 1, title: '', media: '', caption: '' }]
+  });
+  
+  // Artisan Onboarding States
+  const [artisanOnboardData, setArtisanOnboardData] = useState({
+    displayName: '', bio: '', craftTypes: 'Pottery', location: '', yearsExperience: '', coverPhoto: '', fileUploaded: false
+  });
+
+  // Categories list
+  const categories = ['All', 'Pottery', 'Weaving', 'Woodwork', 'Jewelry', 'Embroidery'];
+
+  // Load and refresh state from LocalStorage
+  const loadState = () => {
+    setArtisans(storage.getArtisans());
+    setProducts(storage.getProducts());
+    setPosts(storage.getPosts());
+    setOrders(storage.getOrders());
+    setReviews(storage.getReviews());
+    setFollows(storage.getFollows());
+    setCart(storage.getCart());
+    setCurrentUser(storage.getCurrentUser());
+  };
+
+  useEffect(() => {
+    loadState();
+  }, []);
+
+  // Sync Cart badge and status helper
+  const addToCart = (product) => {
+    const updatedCart = [...cart];
+    const existing = updatedCart.find(item => item.id === product.id);
+    if (existing) {
+      existing.quantity += 1;
+    } else {
+      updatedCart.push({ ...product, quantity: 1 });
+    }
+    setCart(updatedCart);
+    storage.setCart(updatedCart);
+    setView({ name: 'cart', params: null });
+  };
+
+  const removeFromCart = (productId) => {
+    const updatedCart = cart.filter(item => item.id !== productId);
+    setCart(updatedCart);
+    storage.setCart(updatedCart);
+  };
+
+  // Toggle user role between Customer (Madhav) and a custom Artisan profile
+  const toggleUserRole = () => {
+    if (currentUser.role === 'customer') {
+      // Switch to an Artisan role (Ananya Sen by default)
+      const artisanUser = {
+        id: 'artisan_1',
+        role: 'artisan',
+        name: 'Ananya Sen',
+        email: 'ananya@origins.co',
+        craftTypes: ['Pottery'],
+        location: 'Kolkata, West Bengal',
+        yearsExperience: 14,
+        profilePhoto: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&q=80'
+      };
+      storage.saveCurrentUser(artisanUser);
+      setCurrentUser(artisanUser);
+      setView({ name: 'artisan-dashboard', params: null });
+    } else {
+      // Switch back to customer (Madhav)
+      const customerUser = {
+        id: 'cust_1',
+        role: 'customer',
+        name: 'Madhav Sharma',
+        email: 'madhav@origins.co',
+        preferences: ['Pottery', 'Weaving'],
+        addresses: [
+          {
+            id: 'addr_1',
+            name: 'Madhav Sharma',
+            street: '12, Kasturba Gandhi Marg',
+            city: 'New Delhi',
+            state: 'Delhi',
+            zipCode: '110001',
+            phone: '+91 98765 43210',
+            isDefault: true
+          }
+        ]
+      };
+      storage.saveCurrentUser(customerUser);
+      setCurrentUser(customerUser);
+      setView({ name: 'feed', params: null });
+    }
+  };
+
+  // Social interactions
+  const handleLike = (postId) => {
+    const updatedPosts = posts.map(post => {
+      if (post.id === postId) {
+        // Toggle simulated likes
+        const hasLiked = post.hasLiked;
+        return {
+          ...post,
+          likesCount: hasLiked ? post.likesCount - 1 : post.likesCount + 1,
+          hasLiked: !hasLiked
+        };
+      }
+      return post;
+    });
+    setPosts(updatedPosts);
+    // Write back to local storage
+    const targetPost = updatedPosts.find(p => p.id === postId);
+    storage.savePost(targetPost);
+  };
+
+  const handleFollow = (artisanId) => {
+    const isFollowed = storage.toggleFollow(currentUser.id, artisanId);
+    setFollows(storage.getFollows());
+  };
+
+  const isFollowing = (artisanId) => {
+    if (!currentUser) return false;
+    return follows.some(f => f.followerId === currentUser.id && f.followingId === artisanId);
+  };
+
+  const handleAddComment = (postId) => {
+    if (!commentInput.trim()) return;
+    const postToUpdate = posts.find(p => p.id === postId);
+    if (!postToUpdate) return;
+
+    const newComment = {
+      id: `comm_${Date.now()}`,
+      userName: currentUser.name || 'Anonymous User',
+      text: commentInput,
+      createdAt: new Date().toISOString()
+    };
+
+    const updatedComments = [...(postToUpdate.comments || []), newComment];
+    const updatedPost = { ...postToUpdate, comments: updatedComments };
+    storage.savePost(updatedPost);
+    setCommentInput('');
+    loadState();
+  };
+
+  // Customer Checkout
+  const handleCheckout = (e) => {
+    e.preventDefault();
+    if (cart.length === 0) return;
+
+    // Create orders for each artisan's product in the cart
+    cart.forEach(item => {
+      const newOrder = {
+        id: `order_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+        customerId: currentUser.id,
+        artisanId: item.artisanId,
+        productId: item.id,
+        quantity: item.quantity,
+        price: item.price,
+        customizationNotes: item.customizationNotes || 'Standard order.',
+        status: 'placed', // placed, confirmed, shipped, delivered, cancelled
+        shippingAddress: currentUser.addresses[0],
+        paymentStatus: 'paid',
+        createdAt: new Date().toISOString()
+      };
+      storage.saveOrder(newOrder);
+      
+      // Update product stock
+      const prod = products.find(p => p.id === item.id);
+      if (prod) {
+        storage.saveProduct({
+          ...prod,
+          stock: Math.max(0, prod.stock - item.quantity)
+        });
+      }
+    });
+
+    // Clear cart
+    storage.setCart([]);
+    setCart([]);
+    setView({ name: 'customer-dashboard', params: null });
+    loadState();
+  };
+
+  // Review Submit
+  const handleReviewSubmit = (e) => {
+    e.preventDefault();
+    const order = orders.find(o => o.id === reviewFormOrderId);
+    if (!order) return;
+
+    const newReview = {
+      id: `rev_${Date.now()}`,
+      orderId: order.id,
+      customerId: currentUser.id,
+      artisanId: order.artisanId,
+      productId: order.productId,
+      rating: reviewRating,
+      text: reviewText,
+      images: reviewImage ? [reviewImage] : [],
+      createdAt: new Date().toISOString()
+    };
+
+    storage.saveReview(newReview);
+    // Mark order as reviewed or update status if needed
+    storage.saveOrder({
+      ...order,
+      isReviewed: true
+    });
+
+    setReviewFormOrderId(null);
+    setReviewText('');
+    setReviewImage('');
+    setReviewRating(5);
+    loadState();
+  };
+
+  // Artisan Actions
+  const handleCreateProduct = (e) => {
+    e.preventDefault();
+    const prodId = `prod_${Date.now()}`;
+    const productData = {
+      id: prodId,
+      artisanId: currentUser.id,
+      title: newProduct.title,
+      description: newProduct.description,
+      price: parseFloat(newProduct.price),
+      stock: parseInt(newProduct.stock),
+      category: newProduct.category,
+      materials: newProduct.materials.split(',').map(m => m.trim()),
+      timeToCreate: newProduct.timeToCreate,
+      craftTechnique: newProduct.craftTechnique,
+      images: [
+        newProduct.image1 || 'https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?w=800&h=600&fit=crop&q=80',
+        newProduct.image2 || 'https://images.unsplash.com/photo-1576016770956-debb63d900ef?w=800&h=600&fit=crop&q=80'
+      ],
+      isMadeToOrder: newProduct.isMadeToOrder,
+      status: 'active'
+    };
+
+    storage.saveProduct(productData);
+    setNewProduct({
+      title: '', description: '', price: '', stock: '', category: 'Pottery',
+      materials: '', timeToCreate: '', craftTechnique: '', image1: '', image2: '', isMadeToOrder: false
+    });
+    setView({ name: 'artisan-dashboard', params: 'shop' });
+    loadState();
+  };
+
+  const handleAddDiaryDay = () => {
+    setNewPost({
+      ...newPost,
+      diaryEntries: [
+        ...newPost.diaryEntries,
+        { dayNumber: newPost.diaryEntries.length + 1, title: '', media: '', caption: '' }
+      ]
+    });
+  };
+
+  const handleCreatePost = (e) => {
+    e.preventDefault();
+    const postId = `post_${Date.now()}`;
+    const postData = {
+      id: postId,
+      artisanId: currentUser.id,
+      type: newPost.type,
+      media: [newPost.mediaUrl || 'https://images.unsplash.com/photo-1565192647048-f997ed87f5e2?w=800&h=600&fit=crop&q=80'],
+      caption: newPost.caption,
+      craftStory: newPost.craftStory,
+      linkedProductId: newPost.linkedProductId || null,
+      createdAt: new Date().toISOString(),
+      likesCount: 0,
+      savesCount: 0,
+      comments: []
+    };
+
+    if (newPost.type === 'making_diary') {
+      postData.diaryEntries = newPost.diaryEntries.map((entry, idx) => ({
+        ...entry,
+        dayNumber: idx + 1,
+        media: entry.media || 'https://images.unsplash.com/photo-1565192647048-f997ed87f5e2?w=800&h=600&fit=crop&q=80'
+      }));
+      postData.media = [postData.diaryEntries[0].media]; // Main card image
+    }
+
+    storage.savePost(postData);
+    setNewPost({
+      type: 'photo', mediaUrl: '', caption: '', craftStory: '', linkedProductId: '',
+      diaryEntries: [{ dayNumber: 1, title: '', media: '', caption: '' }]
+    });
+    setView({ name: 'feed', params: null });
+    loadState();
+  };
+
+  const handleUpdateOrderStatus = (orderId, newStatus) => {
+    const order = orders.find(o => o.id === orderId);
+    if (!order) return;
+    storage.saveOrder({
+      ...order,
+      status: newStatus
+    });
+    loadState();
+  };
+
+  const handleArtisanOnboardingSubmit = (e) => {
+    e.preventDefault();
+    const updatedUser = {
+      ...currentUser,
+      role: 'artisan',
+      name: artisanOnboardData.displayName,
+      bio: artisanOnboardData.bio,
+      craftTypes: [artisanOnboardData.craftTypes],
+      location: artisanOnboardData.location,
+      yearsExperience: parseInt(artisanOnboardData.yearsExperience),
+      coverPhoto: artisanOnboardData.coverPhoto || 'https://images.unsplash.com/photo-1595273670150-db0d3bf3b765?w=1200&h=400&fit=crop&q=80'
+    };
+    storage.saveCurrentUser(updatedUser);
+    setCurrentUser(updatedUser);
+    setView({ name: 'artisan-dashboard', params: null });
+    loadState();
+  };
+
+  // Helper selectors
+  const getArtisanForProduct = (prod) => artisans.find(a => a.id === prod.artisanId);
+  const getProductForPost = (post) => products.find(p => p.id === post.linkedProductId);
+  const getArtisanForPost = (post) => artisans.find(a => a.id === post.artisanId);
+  const getReviewsForProduct = (productId) => reviews.filter(r => r.productId === productId);
+
+  // Compute stats for Customer Impact Dashboard
+  const customerOrders = orders.filter(o => o.customerId === currentUser?.id);
+  const distinctArtisansSupported = new Set(customerOrders.map(o => o.artisanId)).size;
+  const distinctStatesSupported = new Set(
+    customerOrders.map(o => {
+      const art = artisans.find(a => a.id === o.artisanId);
+      return art ? art.location.split(',').pop().trim() : null;
+    }).filter(Boolean)
+  ).size;
+  const totalPatronSpend = customerOrders.reduce((sum, o) => sum + (o.price * o.quantity), 0);
+
+  // Filtered lists
+  const filteredProducts = products.filter(p => {
+    if (selectedCategory === 'All') return p.status === 'active';
+    return p.status === 'active' && p.category.toLowerCase() === selectedCategory.toLowerCase();
+  });
+
+  const filteredPosts = posts.filter(post => {
+    if (selectedCategory === 'All') return true;
+    // Check if the linked product is of the selected category
+    const linkedProd = getProductForPost(post);
+    if (linkedProd && linkedProd.category.toLowerCase() === selectedCategory.toLowerCase()) {
+      return true;
+    }
+    // Alternatively check if artisan craft matches
+    const postArtisan = getArtisanForPost(post);
+    return postArtisan?.craftTypes.some(c => c.toLowerCase() === selectedCategory.toLowerCase());
+  });
+
+  if (!currentUser) return <div className="loading">Gathering stories...</div>;
+
+  return (
+    <div className="app-container">
+      {/* Header Chrome (Quiet & Clean) */}
+      <header className="main-header">
+        <div className="container header-inner">
+          <div className="logo-section" onClick={() => setView({ name: 'feed', params: null })}>
+            <span className="logo-mark">O</span>
+            <div className="logo-text-group">
+              <h1 className="logo-title">Origins Co.</h1>
+              <span className="logo-tagline">Know Your Origin</span>
+            </div>
+          </div>
+          
+          <nav className="header-nav">
+            <button 
+              className={`nav-link ${view.name === 'feed' ? 'active' : ''}`}
+              onClick={() => setView({ name: 'feed', params: null })}
+            >
+              Stories Feed
+            </button>
+            <button 
+              className={`nav-link ${view.name === 'shop' ? 'active' : ''}`}
+              onClick={() => setView({ name: 'shop', params: null })}
+            >
+              Market
+            </button>
+            
+            {currentUser.role === 'customer' ? (
+              <>
+                <button 
+                  className={`nav-link ${view.name === 'customer-dashboard' ? 'active' : ''}`}
+                  onClick={() => setView({ name: 'customer-dashboard', params: null })}
+                >
+                  My Patronage
+                </button>
+                <button 
+                  className={`nav-link cart-btn ${view.name === 'cart' ? 'active' : ''}`}
+                  onClick={() => setView({ name: 'cart', params: null })}
+                  aria-label="View Cart"
+                >
+                  <ShoppingCart size={18} />
+                  {cart.length > 0 && <span className="cart-badge">{cart.reduce((s, i) => s + i.quantity, 0)}</span>}
+                </button>
+              </>
+            ) : (
+              <button 
+                className={`nav-link ${view.name === 'artisan-dashboard' ? 'active' : ''}`}
+                onClick={() => setView({ name: 'artisan-dashboard', params: null })}
+              >
+                Artisan Studio
+              </button>
+            )}
+          </nav>
+
+          <div className="role-switch-zone">
+            <div className="user-indicator">
+              <User size={14} />
+              <span>{currentUser.name} ({currentUser.role})</span>
+            </div>
+            <button className="btn btn-secondary btn-small" onClick={toggleUserRole}>
+              Switch Mode
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="main-content">
+        <div className="container">
+          
+          {/* CATEGORY BAR (Visible on Feed and Shop) */}
+          {(view.name === 'feed' || view.name === 'shop') && (
+            <div className="category-scroll-bar">
+              <div className="category-scroll-inner">
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    className={`category-pill ${selectedCategory === cat ? 'active' : ''}`}
+                    onClick={() => setSelectedCategory(cat)}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* VIEW: STORIES FEED */}
+          {view.name === 'feed' && (
+            <div className="feed-view-layout fade-in">
+              <div className="feed-main-col">
+                {filteredPosts.length === 0 ? (
+                  <div className="empty-state">
+                    <BookOpen size={48} className="empty-icon" />
+                    <p>No stories found in this category. Be the first to share an origin story!</p>
+                  </div>
+                ) : (
+                  filteredPosts.map(post => {
+                    const postArtisan = getArtisanForPost(post);
+                    const linkedProduct = getProductForPost(post);
+                    const showComments = activePostCommentsId === post.id;
+
+                    return (
+                      <article key={post.id} className="story-card">
+                        {/* Card Header */}
+                        <div className="card-header">
+                          <div 
+                            className="artisan-meta-trigger"
+                            onClick={() => setView({ name: 'artisan-profile', params: post.artisanId })}
+                          >
+                            <img src={postArtisan?.profilePhoto} alt={postArtisan?.displayName} className="avatar-img" />
+                            <div className="artisan-details">
+                              <h3 className="artisan-name">{postArtisan?.displayName}</h3>
+                              <span className="artisan-loc"><MapPin size={12} /> {postArtisan?.location}</span>
+                            </div>
+                          </div>
+                          
+                          {/* Verification Badge */}
+                          <div className="verification-badge-container">
+                            {postArtisan?.verificationTier === 'heritage_keeper' && (
+                              <span className="tier-badge heritage" title="Heritage Keeper: Preserves 50+ year old crafts">
+                                <Award size={12} /> Heritage Keeper
+                              </span>
+                            )}
+                            {postArtisan?.verificationTier === 'master' && (
+                              <span className="tier-badge master" title="Master Craftsman: 10+ years active practice">
+                                <Award size={12} /> Master Artisan
+                              </span>
+                            )}
+                            {postArtisan?.verificationTier === 'verified' && (
+                              <span className="tier-badge verified" title="Verified Artisan identity">
+                                <CheckCircle size={12} /> Verified
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Card Media (Carousel / Static) */}
+                        <div className="card-media">
+                          <img src={post.media[0]} alt="Post visual content" className="post-main-image" />
+                          
+                          {post.type === 'making_diary' && (
+                            <div className="making-diary-banner">
+                              <BookOpen size={14} />
+                              <span>Making Diary • {post.diaryEntries?.length} Days Documented</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Card Actions */}
+                        <div className="card-actions-bar">
+                          <div className="left-actions">
+                            <button 
+                              className={`action-btn ${post.hasLiked ? 'liked' : ''}`}
+                              onClick={() => handleLike(post.id)}
+                              aria-label="Like post"
+                            >
+                              <Heart size={20} fill={post.hasLiked ? "var(--color-terracotta)" : "transparent"} />
+                              <span>{post.likesCount}</span>
+                            </button>
+                            <button 
+                              className="action-btn"
+                              onClick={() => setActivePostCommentsId(showComments ? null : post.id)}
+                              aria-label="View comments"
+                            >
+                              <MessageSquare size={20} />
+                              <span>{post.comments?.length || 0}</span>
+                            </button>
+                          </div>
+                          <button className="action-btn" aria-label="Save post">
+                            <Bookmark size={20} />
+                          </button>
+                        </div>
+
+                        {/* Card Body */}
+                        <div className="card-body-content">
+                          <p className="post-caption">
+                            <strong>{postArtisan?.displayName}</strong> {post.caption}
+                          </p>
+
+                          {/* Human Story section (Differentiator) */}
+                          <div className="story-provenance-box">
+                            <h4 className="story-box-title">The Craft Story</h4>
+                            <p className="story-text-body">{post.craftStory}</p>
+                          </div>
+
+                          {/* Making Diary Expanded (Timeline) */}
+                          {post.type === 'making_diary' && post.diaryEntries && (
+                            <div className="making-timeline-section">
+                              <h4 className="timeline-title"><Calendar size={14} /> Production Chronology</h4>
+                              <div className="timeline-stepper">
+                                {post.diaryEntries.map((entry, index) => (
+                                  <div key={index} className="timeline-step">
+                                    <div className="timeline-node">
+                                      <span className="node-day">D{entry.dayNumber}</span>
+                                    </div>
+                                    <div className="timeline-content-card">
+                                      <div className="timeline-img-wrap">
+                                        <img src={entry.media} alt={entry.title} />
+                                      </div>
+                                      <div className="timeline-details">
+                                        <h5>{entry.title}</h5>
+                                        <p>{entry.caption}</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Linked Product Card */}
+                          {linkedProduct && (
+                            <div className="linked-product-card">
+                              <div className="linked-prod-img-wrap">
+                                <img src={linkedProduct.images[0]} alt={linkedProduct.title} />
+                              </div>
+                              <div className="linked-prod-details">
+                                <span className="product-category-tag">{linkedProduct.category}</span>
+                                <h4 className="product-card-title">{linkedProduct.title}</h4>
+                                <div className="product-pricing">
+                                  <span className="price-tag">₹{linkedProduct.price}</span>
+                                  <span className="time-tag"><Clock size={12} /> {linkedProduct.timeToCreate.split(' ')[0]} {linkedProduct.timeToCreate.split(' ')[1] || 'days'}</span>
+                                </div>
+                              </div>
+                              <button 
+                                className="btn btn-primary btn-small"
+                                onClick={() => setView({ name: 'product-detail', params: linkedProduct.id })}
+                              >
+                                View Product
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Comments Drawer / Drawer UI */}
+                        {showComments && (
+                          <div className="comments-drawer">
+                            <div className="comments-list">
+                              {post.comments && post.comments.length > 0 ? (
+                                post.comments.map(c => (
+                                  <div key={c.id} className="comment-item">
+                                    <strong>{c.userName}</strong>
+                                    <p>{c.text}</p>
+                                  </div>
+                                ))
+                              ) : (
+                                <p className="no-comments-msg">No comments yet. Write a note to encourage the artisan!</p>
+                              )}
+                            </div>
+                            <div className="comment-form-bar">
+                              <input 
+                                type="text" 
+                                placeholder="Add a thoughtful comment..." 
+                                value={commentInput}
+                                onChange={(e) => setCommentInput(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleAddComment(post.id)}
+                              />
+                              <button className="btn btn-primary btn-small" onClick={() => handleAddComment(post.id)}>Post</button>
+                            </div>
+                          </div>
+                        )}
+                      </article>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Feed Sidebar (Quiet Showcase) */}
+              <aside className="feed-sidebar">
+                <div className="sidebar-widget welcome-widget">
+                  <h3>Our Philosophy</h3>
+                  <p>Every handwoven weave, carved grain of wood, and terracotta kiln-fired pot holds a human history. Origins Co. ensures full provenance traceability directly from the creator's hands to yours.</p>
+                </div>
+                
+                <div className="sidebar-widget featured-artisans-widget">
+                  <h3>Featured Artisans</h3>
+                  <div className="featured-artisans-list">
+                    {artisans.slice(0, 3).map(art => (
+                      <div 
+                        key={art.id} 
+                        className="featured-art-item"
+                        onClick={() => setView({ name: 'artisan-profile', params: art.id })}
+                      >
+                        <img src={art.profilePhoto} alt={art.displayName} />
+                        <div className="feat-details">
+                          <h4>{art.displayName}</h4>
+                          <span>{art.location}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </aside>
+            </div>
+          )}
+
+          {/* VIEW: SHOP MARKET */}
+          {view.name === 'shop' && (
+            <div className="shop-view-layout fade-in">
+              <div className="shop-header">
+                <h2>The Handcrafted Market</h2>
+                <p>Support creators directly. Every purchase comes with a physical card containing the provenance certificate.</p>
+              </div>
+
+              {filteredProducts.length === 0 ? (
+                <div className="empty-state">
+                  <ShoppingBag size={48} className="empty-icon" />
+                  <p>No products available in this category. Check back soon for fresh creations!</p>
+                </div>
+              ) : (
+                <div className="product-grid">
+                  {filteredProducts.map(prod => {
+                    const prodArtisan = getArtisanForProduct(prod);
+                    return (
+                      <div 
+                        key={prod.id} 
+                        className="product-card-item"
+                        onClick={() => setView({ name: 'product-detail', params: prod.id })}
+                      >
+                        <div className="prod-card-image-wrap">
+                          <img src={prod.images[0]} alt={prod.title} />
+                          {prod.isMadeToOrder && (
+                            <span className="order-type-badge">Made to Order</span>
+                          )}
+                        </div>
+                        
+                        <div className="prod-card-meta">
+                          <span className="prod-card-artisan-name">by {prodArtisan?.displayName}</span>
+                          <h3 className="prod-card-title">{prod.title}</h3>
+                          <p className="prod-card-technique">{prod.craftTechnique}</p>
+                          <div className="prod-card-footer">
+                            <span className="prod-card-price">₹{prod.price}</span>
+                            <span className="prod-card-time"><Clock size={12} /> {prod.timeToCreate}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* VIEW: PRODUCT DETAIL */}
+          {view.name === 'product-detail' && (() => {
+            const product = products.find(p => p.id === view.params);
+            if (!product) return <div className="error-message">Product not found.</div>;
+            const artisanInfo = getArtisanForProduct(product);
+            const productReviews = getReviewsForProduct(product.id);
+            const avgRating = productReviews.length > 0 
+              ? (productReviews.reduce((sum, r) => sum + r.rating, 0) / productReviews.length).toFixed(1)
+              : null;
+
+            return (
+              <div className="product-detail-layout fade-in">
+                <button className="back-link-btn" onClick={() => setView({ name: 'shop', params: null })}>
+                  <ArrowLeft size={16} /> Back to Market
+                </button>
+
+                <div className="detail-cols-grid">
+                  {/* Media Gallery Col */}
+                  <div className="detail-media-gallery">
+                    <div className="main-image-wrap">
+                      <img src={product.images[0]} alt={product.title} />
+                    </div>
+                    {product.images.length > 1 && (
+                      <div className="secondary-images-strip">
+                        {product.images.slice(1).map((img, idx) => (
+                          <div key={idx} className="secondary-image-wrap">
+                            <img src={img} alt={`${product.title} secondary`} />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Actions & Buying Details Col */}
+                  <div className="detail-buying-actions">
+                    <span className="detail-category-tag">{product.category}</span>
+                    <h2 className="detail-product-title">{product.title}</h2>
+                    
+                    {/* Star aggregate */}
+                    <div className="rating-summary-strip">
+                      {avgRating ? (
+                        <>
+                          <div className="stars-row">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} size={14} fill={i < Math.round(avgRating) ? "var(--color-terracotta)" : "transparent"} color="var(--color-terracotta)" />
+                            ))}
+                          </div>
+                          <span className="rating-number">{avgRating} ({productReviews.length} reviews)</span>
+                        </>
+                      ) : (
+                        <span className="rating-number">No reviews yet</span>
+                      )}
+                    </div>
+
+                    <div className="detail-price-box">
+                      <span className="detail-price">₹{product.price}</span>
+                      <span className="detail-stock-status">
+                        {product.stock > 0 ? `${product.stock} items remaining` : 'Out of stock (Made to order)'}
+                      </span>
+                    </div>
+
+                    <p className="detail-description-p">{product.description}</p>
+
+                    <div className="detail-tech-specs">
+                      <div className="tech-spec-item">
+                        <span className="spec-label">Technique:</span>
+                        <span className="spec-val">{product.craftTechnique}</span>
+                      </div>
+                      <div className="tech-spec-item">
+                        <span className="spec-label">Time to Create:</span>
+                        <span className="spec-val">{product.timeToCreate}</span>
+                      </div>
+                    </div>
+
+                    <div className="buy-button-wrapper">
+                      {currentUser.role === 'customer' ? (
+                        <button 
+                          className="btn btn-primary btn-large btn-full-width"
+                          onClick={() => addToCart(product)}
+                          disabled={product.stock === 0 && !product.isMadeToOrder}
+                        >
+                          <ShoppingCart size={18} />
+                          Add to Patronage Cart
+                        </button>
+                      ) : (
+                        <div className="artisan-preview-notice">
+                          <p>You are viewing this product in Artisan Mode. Switch to Customer Mode to buy.</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* PROVENANCE CERTIFICATE BADGE (Simplified differentiator) */}
+                    <div className="provenance-badge-box">
+                      <div className="badge-header-row">
+                        <Globe size={18} className="cert-globe" />
+                        <h4>Verified Origin Certificate</h4>
+                      </div>
+                      <p>Every piece is stamped with a unique physical QR certificate linking to this digital ledger of the artisan's workspace. Certified materials and localized origin verified by Origins Co. standards.</p>
+                      
+                      <div className="simulated-qr-box">
+                        <div className="qr-img-mock">
+                          {/* Quick visual grid representing QR */}
+                          <div className="qr-cube"></div>
+                          <div className="qr-text">ORIGIN VERIFIED</div>
+                        </div>
+                        <div className="qr-details">
+                          <span className="cert-num">CERT ID: #OR-{product.id.split('_').pop()}</span>
+                          <span className="cert-status-tag">Status: Active Ledger</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* THE "MADE BY" CARD (Signature Core Differentiator) */}
+                <section className="made-by-card-section">
+                  <div className="made-by-card-wrapper">
+                    <div className="card-decor-accent"></div>
+                    <div className="made-by-card-inner">
+                      <div className="made-by-header">
+                        <div className="made-by-logo">MADE BY IDENTITY CARD</div>
+                        <span className="prov-tag">PROVENANCE LOG</span>
+                      </div>
+
+                      <div className="made-by-body-grid">
+                        {/* Bio & Face */}
+                        <div className="mb-profile-col">
+                          <img src={artisanInfo?.profilePhoto} alt={artisanInfo?.displayName} className="mb-avatar" />
+                          <div className="mb-meta">
+                            <h3>{artisanInfo?.displayName}</h3>
+                            <span className="mb-loc"><MapPin size={12} /> {artisanInfo?.location}</span>
+                            <span className="mb-exp">{artisanInfo?.yearsExperience} Years Experience</span>
+                          </div>
+                        </div>
+
+                        {/* Craft Background */}
+                        <div className="mb-story-col">
+                          <h4>The Creator's Story</h4>
+                          <p className="mb-story-text">"{artisanInfo?.bio}"</p>
+                        </div>
+
+                        {/* Materials Log */}
+                        <div className="mb-materials-col">
+                          <h4>Material & Technique Traceability</h4>
+                          <ul className="mb-materials-list">
+                            <li>
+                              <strong>Technique:</strong> {product.craftTechnique}
+                            </li>
+                            <li>
+                              <strong>Materials Used:</strong> {product.materials.join(', ')}
+                            </li>
+                            <li>
+                              <strong>Time Investment:</strong> {product.timeToCreate}
+                            </li>
+                          </ul>
+                          <div className="verif-tier-stamp">
+                            <Award size={14} />
+                            <span>Verification Level: {artisanInfo?.verificationTier.toUpperCase()}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* REVIEWS SECTION */}
+                <section className="product-reviews-section">
+                  <h3 className="reviews-section-title">Customer Appraisals</h3>
+                  {productReviews.length === 0 ? (
+                    <p className="no-reviews-p">No reviews have been written for this craftwork yet.</p>
+                  ) : (
+                    <div className="reviews-stack">
+                      {productReviews.map(rev => (
+                        <div key={rev.id} className="review-card-item">
+                          <div className="review-header">
+                            <span className="reviewer-name">Patron Reviewer</span>
+                            <div className="review-stars">
+                              {[...Array(5)].map((_, i) => (
+                                <Star key={i} size={12} fill={i < rev.rating ? "var(--color-terracotta)" : "transparent"} color="var(--color-terracotta)" />
+                              ))}
+                            </div>
+                            <span className="review-date">{new Date(rev.createdAt).toLocaleDateString()}</span>
+                          </div>
+                          <p className="review-text">{rev.text}</p>
+                          {rev.images && rev.images.length > 0 && (
+                            <div className="review-images-grid">
+                              {rev.images.map((img, idx) => (
+                                <img key={idx} src={img} alt="Customer product snapshot" className="review-snapshot-img" />
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </section>
+              </div>
+            );
+          })()}
+
+          {/* VIEW: CART AND CHECKOUT */}
+          {view.name === 'cart' && (
+            <div className="cart-view-layout fade-in">
+              <div className="cart-header">
+                <h2>Patronage Shopping Cart</h2>
+                <p>Support local weavers, potters, and carpenters. Every product goes directly to sustaining their craft.</p>
+              </div>
+
+              {cart.length === 0 ? (
+                <div className="empty-cart-state">
+                  <ShoppingCart size={64} className="empty-cart-icon" />
+                  <p>Your cart is empty. Explore the stories feed or market to discover beautiful artisan crafts.</p>
+                  <button className="btn btn-primary" onClick={() => setView({ name: 'shop', params: null })}>Go to Market</button>
+                </div>
+              ) : (
+                <div className="cart-cols-grid">
+                  {/* Items List */}
+                  <div className="cart-items-list">
+                    {cart.map(item => {
+                      const itemArtisan = getArtisanForProduct(item);
+                      return (
+                        <div key={item.id} className="cart-item-row">
+                          <div className="cart-item-img-wrap">
+                            <img src={item.images[0]} alt={item.title} />
+                          </div>
+                          <div className="cart-item-details">
+                            <h3 className="cart-item-title">{item.title}</h3>
+                            <span className="cart-item-artisan">by {itemArtisan?.displayName}</span>
+                            <span className="cart-item-price">₹{item.price} each</span>
+                          </div>
+                          <div className="cart-item-actions">
+                            <div className="quantity-badge">Qty: {item.quantity}</div>
+                            <button 
+                              className="btn-text btn-small remove-item-btn" 
+                              onClick={() => removeFromCart(item.id)}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Checkout Form */}
+                  <div className="checkout-form-container">
+                    <h3>Shipping & Checkout</h3>
+                    <div className="order-summary-box">
+                      <div className="summary-row">
+                        <span>Craft Total</span>
+                        <span>₹{cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)}</span>
+                      </div>
+                      <div className="summary-row">
+                        <span>Platform Shipping Support</span>
+                        <span>₹150</span>
+                      </div>
+                      <div className="summary-row total-row">
+                        <span>Total Due</span>
+                        <span>₹{cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + 150}</span>
+                      </div>
+                    </div>
+
+                    <form onSubmit={handleCheckout} className="checkout-form-element">
+                      <h4 className="form-section-title">Delivery Address</h4>
+                      <div className="saved-address-card">
+                        <strong>{currentUser.addresses[0]?.name}</strong>
+                        <p>{currentUser.addresses[0]?.street}</p>
+                        <p>{currentUser.addresses[0]?.city}, {currentUser.addresses[0]?.state} - {currentUser.addresses[0]?.zipCode}</p>
+                        <p>Phone: {currentUser.addresses[0]?.phone}</p>
+                      </div>
+
+                      <div className="payment-simulation-notice">
+                        <p>Simulating Razorpay/Stripe checkout. No actual money will be charged.</p>
+                      </div>
+
+                      <button type="submit" className="btn btn-primary btn-large btn-full-width">
+                        Confirm & Place Order
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* VIEW: CUSTOMER DASHBOARD */}
+          {view.name === 'customer-dashboard' && (
+            <div className="customer-dashboard-layout fade-in">
+              {/* IMPACT DASHBOARD SECTION (Core loop value) */}
+              <section className="impact-dashboard">
+                <div className="impact-header">
+                  <h2>Your Craft Support Map</h2>
+                  <p>Every transaction on Origins Co. feeds directly into the preservation of indigenous craft sectors.</p>
+                </div>
+                
+                <div className="impact-stats-grid">
+                  <div className="impact-stat-card">
+                    <span className="impact-stat-number">{distinctArtisansSupported}</span>
+                    <span className="impact-stat-label">Artisans Sustained</span>
+                  </div>
+                  <div className="impact-stat-card">
+                    <span className="impact-stat-number">{distinctStatesSupported}</span>
+                    <span className="impact-stat-label">States Supported</span>
+                  </div>
+                  <div className="impact-stat-card">
+                    <span className="impact-stat-number">₹{totalPatronSpend}</span>
+                    <span className="impact-stat-label">Direct Contribution</span>
+                  </div>
+                </div>
+              </section>
+
+              {/* ORDERS LIST */}
+              <section className="customer-orders-section">
+                <h3>Your Ordered Provenance Logs</h3>
+                {customerOrders.length === 0 ? (
+                  <p className="no-orders-p">No orders placed yet. Start supporting artisans in the market!</p>
+                ) : (
+                  <div className="orders-stack">
+                    {customerOrders.map(order => {
+                      const orderProd = products.find(p => p.id === order.productId);
+                      const orderArt = artisans.find(a => a.id === order.artisanId);
+                      
+                      return (
+                        <div key={order.id} className="order-ledger-card">
+                          <div className="order-ledger-header">
+                            <span className="order-id-label">ORDER ID: {order.id.split('_')[1]}</span>
+                            <span className="order-date-label">Placed: {new Date(order.createdAt).toLocaleDateString()}</span>
+                            <span className={`status-badge-val ${order.status}`}>
+                              {order.status.toUpperCase()}
+                            </span>
+                          </div>
+
+                          <div className="order-ledger-body">
+                            <div className="order-product-info">
+                              <img src={orderProd?.images[0]} alt={orderProd?.title} className="order-thumbnail-img" />
+                              <div className="order-prod-meta">
+                                <h4>{orderProd?.title}</h4>
+                                <span>Artisan: {orderArt?.displayName}</span>
+                                <span>Quantity: {order.quantity} | Total: ₹{order.price * order.quantity}</span>
+                              </div>
+                            </div>
+
+                            <div className="order-actions-zone">
+                              {order.status === 'delivered' && !order.isReviewed && (
+                                <button 
+                                  className="btn btn-secondary btn-small"
+                                  onClick={() => setReviewFormOrderId(order.id)}
+                                >
+                                  Submit Craft Appraisal
+                                </button>
+                              )}
+                              {order.isReviewed && (
+                                <span className="reviewed-badge-indicator">Appraisal Submitted</span>
+                              )}
+                              
+                              <button 
+                                className="btn btn-text btn-small"
+                                onClick={() => setView({ name: 'product-detail', params: order.productId })}
+                              >
+                                View Traceability
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Appraise Form Toggle */}
+                          {reviewFormOrderId === order.id && (
+                            <form onSubmit={handleReviewSubmit} className="review-dropdown-form fade-in">
+                              <h4>Write a Craft Appraisal</h4>
+                              <div className="form-group">
+                                <label>Appraisal Rating</label>
+                                <select 
+                                  value={reviewRating} 
+                                  onChange={(e) => setReviewRating(parseInt(e.target.value))}
+                                >
+                                  <option value="5">5 Stars — Excellent Craftsmanship</option>
+                                  <option value="4">4 Stars — Very Good Quality</option>
+                                  <option value="3">3 Stars — Satisfactory</option>
+                                  <option value="2">2 Stars — Needs Improvement</option>
+                                  <option value="1">1 Star — Unsatisfactory</option>
+                                </select>
+                              </div>
+                              <div className="form-group">
+                                <label>Write Your Experience</label>
+                                <textarea 
+                                  rows="3"
+                                  placeholder="Describe the tactile quality, finish, packaging, and beauty of this product..."
+                                  value={reviewText}
+                                  onChange={(e) => setReviewText(e.target.value)}
+                                  required
+                                ></textarea>
+                              </div>
+                              <div className="form-group">
+                                <label>Optional Snapshot Link</label>
+                                <input 
+                                  type="url"
+                                  placeholder="Unsplash / image url for review image..."
+                                  value={reviewImage}
+                                  onChange={(e) => setReviewImage(e.target.value)}
+                                />
+                              </div>
+                              <div className="form-actions-row">
+                                <button type="submit" className="btn btn-primary btn-small">Submit Appraisal</button>
+                                <button type="button" className="btn btn-secondary btn-small" onClick={() => setReviewFormOrderId(null)}>Cancel</button>
+                              </div>
+                            </form>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </section>
+            </div>
+          )}
+
+          {/* VIEW: ARTISAN STUDIO DASHBOARD */}
+          {view.name === 'artisan-dashboard' && (
+            <div className="artisan-dashboard-layout fade-in">
+              <div className="studio-header">
+                <h2>Artisan Studio</h2>
+                <p>Add products, share raw workshops stories, and check order requests.</p>
+              </div>
+
+              {/* Sub-navigation inside studio */}
+              <div className="studio-sub-nav">
+                <button 
+                  className={`studio-tab-btn ${!view.params || view.params === 'overview' ? 'active' : ''}`}
+                  onClick={() => setView({ name: 'artisan-dashboard', params: 'overview' })}
+                >
+                  Overview & Listings
+                </button>
+                <button 
+                  className={`studio-tab-btn ${view.params === 'create-product' ? 'active' : ''}`}
+                  onClick={() => setView({ name: 'artisan-dashboard', params: 'create-product' })}
+                >
+                  Add Product
+                </button>
+                <button 
+                  className={`studio-tab-btn ${view.params === 'create-post' ? 'active' : ''}`}
+                  onClick={() => setView({ name: 'artisan-dashboard', params: 'create-post' })}
+                >
+                  Share Story/Diary
+                </button>
+              </div>
+
+              {/* TAB: OVERVIEW & LISTINGS */}
+              {(!view.params || view.params === 'overview') && (
+                <div className="studio-overview-grid">
+                  {/* Left Column: Orders */}
+                  <div className="studio-orders-col">
+                    <h3>Patronage Orders Inbox</h3>
+                    {orders.filter(o => o.artisanId === currentUser.id).length === 0 ? (
+                      <p className="no-orders-p">No orders received yet.</p>
+                    ) : (
+                      <div className="studio-orders-list">
+                        {orders.filter(o => o.artisanId === currentUser.id).map(order => {
+                          const orderProd = products.find(p => p.id === order.productId);
+                          return (
+                            <div key={order.id} className="studio-order-card">
+                              <div className="order-details-header">
+                                <strong>Order #{order.id.split('_')[1]}</strong>
+                                <span className={`status-badge-val ${order.status}`}>{order.status}</span>
+                              </div>
+                              <div className="order-details-body">
+                                <p>Product: {orderProd?.title}</p>
+                                <p>Quantity: {order.quantity} | Total: ₹{order.price * order.quantity}</p>
+                                <p>Notes: {order.customizationNotes}</p>
+                                <p className="cust-shipping-txt">
+                                  Ship To: {order.shippingAddress?.name}, {order.shippingAddress?.street}, {order.shippingAddress?.city}
+                                </p>
+                              </div>
+                              <div className="order-status-actions">
+                                {order.status === 'placed' && (
+                                  <button 
+                                    className="btn btn-primary btn-small"
+                                    onClick={() => handleUpdateOrderStatus(order.id, 'confirmed')}
+                                  >
+                                    Accept & Confirm
+                                  </button>
+                                )}
+                                {order.status === 'confirmed' && (
+                                  <button 
+                                    className="btn btn-primary btn-small"
+                                    onClick={() => handleUpdateOrderStatus(order.id, 'shipped')}
+                                  >
+                                    Mark as Shipped
+                                  </button>
+                                )}
+                                {order.status === 'shipped' && (
+                                  <button 
+                                    className="btn btn-secondary btn-small"
+                                    onClick={() => handleUpdateOrderStatus(order.id, 'delivered')}
+                                  >
+                                    Confirm Delivery
+                                  </button>
+                                )}
+                                {order.status === 'delivered' && (
+                                  <span className="success-txt-indicator"><CheckCircle size={14} /> Completed</span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right Column: Profile & Analytics */}
+                  <div className="studio-profile-col">
+                    <div className="studio-card profile-card">
+                      <h3>Studio Profile</h3>
+                      <div className="studio-profile-meta">
+                        <img src={currentUser.profilePhoto} alt={currentUser.name} className="studio-profile-avatar" />
+                        <div>
+                          <h4>{currentUser.name}</h4>
+                          <p>{currentUser.location}</p>
+                          <span className="studio-exp-tag">{currentUser.yearsExperience} Years Exp</span>
+                        </div>
+                      </div>
+                      <div className="verification-status-panel">
+                        <Award size={18} className="icon-award" />
+                        <div>
+                          <strong>Verification Queue Tracker</strong>
+                          <p>Your studio is approved. Status: Master Artisan.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="studio-card products-list-card">
+                      <h3>Active Craft Listings</h3>
+                      <div className="studio-products-list">
+                        {products.filter(p => p.artisanId === currentUser.id).map(p => (
+                          <div key={p.id} className="studio-product-item">
+                            <img src={p.images[0]} alt={p.title} />
+                            <div>
+                              <h4>{p.title}</h4>
+                              <span>Stock: {p.stock} | Price: ₹{p.price}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: ADD PRODUCT */}
+              {view.params === 'create-product' && (
+                <div className="studio-form-container">
+                  <h3>List a New Handmade Creation</h3>
+                  <p className="form-info-txt">Every product listing requires detail fields about techniques and raw materials to automatically populate the "Made By" identity card and provenance certification.</p>
+                  
+                  <form onSubmit={handleCreateProduct} className="studio-form-element">
+                    <div className="grid grid-cols-2 gap-md">
+                      <div className="form-group">
+                        <label>Product Title</label>
+                        <input 
+                          type="text" 
+                          placeholder="e.g. Ganges Clay Terracotta Pitcher"
+                          value={newProduct.title}
+                          onChange={(e) => setNewProduct({...newProduct, title: e.target.value})}
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Category</label>
+                        <select 
+                          value={newProduct.category}
+                          onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
+                        >
+                          <option value="Pottery">Pottery</option>
+                          <option value="Weaving">Weaving</option>
+                          <option value="Woodwork">Woodwork</option>
+                          <option value="Jewelry">Jewelry</option>
+                          <option value="Embroidery">Embroidery</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label>Product Story Description</label>
+                      <textarea 
+                        rows="3" 
+                        placeholder="Write details about the texture, origin, packaging, and utility of this specific item..."
+                        value={newProduct.description}
+                        onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
+                        required
+                      ></textarea>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-md">
+                      <div className="form-group">
+                        <label>Base Price (INR)</label>
+                        <input 
+                          type="number" 
+                          placeholder="1850"
+                          value={newProduct.price}
+                          onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Quantity In Stock</label>
+                        <input 
+                          type="number" 
+                          placeholder="5"
+                          value={newProduct.stock}
+                          onChange={(e) => setNewProduct({...newProduct, stock: e.target.value})}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label>Raw Materials Used (Comma Separated)</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. Silt Clay, Iron Oxide glazes, Oak wood shaving firings"
+                        value={newProduct.materials}
+                        onChange={(e) => setNewProduct({...newProduct, materials: e.target.value})}
+                        required
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-md">
+                      <div className="form-group">
+                        <label>Time Taken to Create</label>
+                        <input 
+                          type="text" 
+                          placeholder="e.g. 3 days (throwing, drying, wood firing)"
+                          value={newProduct.timeToCreate}
+                          onChange={(e) => setNewProduct({...newProduct, timeToCreate: e.target.value})}
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Specific Craft Technique</label>
+                        <input 
+                          type="text" 
+                          placeholder="e.g. Wheel-thrown terracotta, pit-fired"
+                          value={newProduct.craftTechnique}
+                          onChange={(e) => setNewProduct({...newProduct, craftTechnique: e.target.value})}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-md">
+                      <div className="form-group">
+                        <label>Primary Image URL</label>
+                        <input 
+                          type="url" 
+                          placeholder="Unsplash url or equivalent..."
+                          value={newProduct.image1}
+                          onChange={(e) => setNewProduct({...newProduct, image1: e.target.value})}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Secondary Image URL</label>
+                        <input 
+                          type="url" 
+                          placeholder="Unsplash url or equivalent..."
+                          value={newProduct.image2}
+                          onChange={(e) => setNewProduct({...newProduct, image2: e.target.value})}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="checkbox-group">
+                      <input 
+                        type="checkbox" 
+                        id="isMadeToOrder"
+                        checked={newProduct.isMadeToOrder}
+                        onChange={(e) => setNewProduct({...newProduct, isMadeToOrder: e.target.checked})}
+                      />
+                      <label htmlFor="isMadeToOrder" className="checkbox-label">This item is Made to Order (Stock can be custom made if sold out)</label>
+                    </div>
+
+                    <button type="submit" className="btn btn-primary btn-large">Publish Craft Listing</button>
+                  </form>
+                </div>
+              )}
+
+              {/* TAB: SHARE STORY / DIARY */}
+              {view.params === 'create-post' && (
+                <div className="studio-form-container">
+                  <h3>Share an Origin Story or Making Diary</h3>
+                  <p className="form-info-txt">Post a standard photo/video story about your craft, or document a step-by-step Making Diary spanning multiple days of creation.</p>
+                  
+                  <form onSubmit={handleCreatePost} className="studio-form-element">
+                    <div className="grid grid-cols-2 gap-md">
+                      <div className="form-group">
+                        <label>Story Type</label>
+                        <select 
+                          value={newPost.type}
+                          onChange={(e) => setNewPost({...newPost, type: e.target.value})}
+                        >
+                          <option value="photo">Standard Photo Post</option>
+                          <option value="making_diary">Making Diary (Multi-Day Timeline)</option>
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label>Link to Product Listing (Optional)</label>
+                        <select 
+                          value={newPost.linkedProductId}
+                          onChange={(e) => setNewPost({...newPost, linkedProductId: e.target.value})}
+                        >
+                          <option value="">No Product Linked</option>
+                          {products.filter(p => p.artisanId === currentUser.id).map(p => (
+                            <option key={p.id} value={p.id}>{p.title}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label>Story Cover Image URL</label>
+                      <input 
+                        type="url" 
+                        placeholder="Unsplash image URL..."
+                        value={newPost.mediaUrl}
+                        onChange={(e) => setNewPost({...newPost, mediaUrl: e.target.value})}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Post Summary Caption</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. Refining the clay bodies for our upcoming pottery kiln launch..."
+                        value={newPost.caption}
+                        onChange={(e) => setNewPost({...newPost, caption: e.target.value})}
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>The Human Craft Story (Behind-the-Scenes detail)</label>
+                      <textarea 
+                        rows="4" 
+                        placeholder="Share the struggles, material search, technique challenges, or local history behind this effort..."
+                        value={newPost.craftStory}
+                        onChange={(e) => setNewPost({...newPost, craftStory: e.target.value})}
+                        required
+                      ></textarea>
+                    </div>
+
+                    {/* MAKING DIARY BUILDER */}
+                    {newPost.type === 'making_diary' && (
+                      <div className="diary-entries-builder">
+                        <h4>Configure Diary Timeline Days</h4>
+                        {newPost.diaryEntries.map((entry, index) => (
+                          <div key={index} className="diary-day-card">
+                            <h5>Day {entry.dayNumber} Entry</h5>
+                            <div className="grid grid-cols-2 gap-md">
+                              <div className="form-group">
+                                <label>Day Activity Title</label>
+                                <input 
+                                  type="text" 
+                                  placeholder="e.g. Clay preparation & wedging"
+                                  value={entry.title}
+                                  onChange={(e) => {
+                                    const updated = [...newPost.diaryEntries];
+                                    updated[index].title = e.target.value;
+                                    setNewPost({...newPost, diaryEntries: updated});
+                                  }}
+                                  required
+                                />
+                              </div>
+                              <div className="form-group">
+                                <label>Day Image URL</label>
+                                <input 
+                                  type="url" 
+                                  placeholder="Unsplash image URL..."
+                                  value={entry.media}
+                                  onChange={(e) => {
+                                    const updated = [...newPost.diaryEntries];
+                                    updated[index].media = e.target.value;
+                                    setNewPost({...newPost, diaryEntries: updated});
+                                  }}
+                                />
+                              </div>
+                            </div>
+                            <div className="form-group">
+                              <label>Day Detail description</label>
+                              <input 
+                                type="text" 
+                                placeholder="Detail what happened on this day of production..."
+                                value={entry.caption}
+                                onChange={(e) => {
+                                  const updated = [...newPost.diaryEntries];
+                                  updated[index].caption = e.target.value;
+                                  setNewPost({...newPost, diaryEntries: updated});
+                                }}
+                                required
+                              />
+                            </div>
+                          </div>
+                        ))}
+                        <button 
+                          type="button" 
+                          className="btn btn-secondary btn-small" 
+                          onClick={handleAddDiaryDay}
+                        >
+                          + Add Next Production Day
+                        </button>
+                      </div>
+                    )}
+
+                    <button type="submit" className="btn btn-primary btn-large">Publish Craft Story</button>
+                  </form>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* VIEW: ARTISAN PUBLIC PROFILE */}
+          {view.name === 'artisan-profile' && (() => {
+            const artisan = artisans.find(a => a.id === view.params);
+            if (!artisan) return <div className="error-message">Artisan profile not found.</div>;
+            
+            const artisanProducts = products.filter(p => p.artisanId === artisan.id && p.status === 'active');
+            const artisanPosts = posts.filter(p => p.artisanId === artisan.id);
+
+            return (
+              <div className="artisan-profile-view fade-in">
+                {/* Profile Cover & Header Banner */}
+                <div className="profile-cover-banner">
+                  <img src={artisan.coverPhoto} alt="Artisan workspace cover" />
+                </div>
+
+                <div className="profile-header-details">
+                  <div className="header-meta-row">
+                    <img src={artisan.profilePhoto} alt={artisan.displayName} className="profile-large-avatar" />
+                    <div className="header-text-block">
+                      <div className="title-and-tier">
+                        <h2>{artisan.displayName}</h2>
+                        {artisan.verificationTier === 'heritage_keeper' && (
+                          <span className="tier-badge-large heritage"><Award size={14} /> Heritage Keeper</span>
+                        )}
+                        {artisan.verificationTier === 'master' && (
+                          <span className="tier-badge-large master"><Award size={14} /> Master Artisan</span>
+                        )}
+                        {artisan.verificationTier === 'verified' && (
+                          <span className="tier-badge-large verified"><CheckCircle size={14} /> Verified Artisan</span>
+                        )}
+                      </div>
+                      <span className="loc-text"><MapPin size={14} /> {artisan.location}</span>
+                      <span className="exp-text">{artisan.yearsExperience} years honing this craft</span>
+                    </div>
+
+                    <div className="profile-follow-zone">
+                      {currentUser.role === 'customer' && (
+                        <button 
+                          className={`btn ${isFollowing(artisan.id) ? 'btn-secondary' : 'btn-primary'}`}
+                          onClick={() => handleFollow(artisan.id)}
+                        >
+                          {isFollowing(artisan.id) ? 'Following Artisan' : 'Follow Artisan'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="artisan-long-story">
+                    <h3>The Artisan's Journey</h3>
+                    <p className="journey-text">"{artisan.bio}"</p>
+                  </div>
+                </div>
+
+                {/* Grid Split: Listings and Content */}
+                <div className="artisan-catalog-layout">
+                  <div className="catalog-tabs">
+                    <h3>Craft Shop Catalog</h3>
+                  </div>
+
+                  <div className="artisan-product-grid">
+                    {artisanProducts.map(p => (
+                      <div 
+                        key={p.id} 
+                        className="product-card-item"
+                        onClick={() => setView({ name: 'product-detail', params: p.id })}
+                      >
+                        <div className="prod-card-image-wrap">
+                          <img src={p.images[0]} alt={p.title} />
+                        </div>
+                        <div className="prod-card-meta">
+                          <h4 className="prod-card-title">{p.title}</h4>
+                          <span className="prod-card-price">₹{p.price}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="catalog-tabs posts-tab-head">
+                    <h3>Studio Chronicles & Process</h3>
+                  </div>
+
+                  <div className="artisan-posts-grid">
+                    {artisanPosts.map(post => (
+                      <div 
+                        key={post.id} 
+                        className="profile-post-thumbnail"
+                        onClick={() => setView({ name: 'feed', params: null })} // Redirect to feed to read
+                      >
+                        <img src={post.media[0]} alt="Process diary image" />
+                        <div className="post-thumbnail-overlay">
+                          <p>{post.caption.substring(0, 60)}...</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+        </div>
+      </main>
+
+      {/* Footer (Quiet Editorial Footer) */}
+      <footer className="main-footer">
+        <div className="container footer-inner">
+          <div className="footer-copyright">
+            <h4>Origins Co.</h4>
+            <p>Every product has an origin. Know yours.</p>
+            <span>&copy; {new Date().getFullYear()} Origins Co. All rights reserved.</span>
+          </div>
+          <div className="footer-links">
+            <a href="#about" onClick={(e) => { e.preventDefault(); alert("Origins Co. connects patrons directly with regional artisans, guaranteeing materials and provenance authenticity."); }}>About Project</a>
+            <a href="#standards" onClick={(e) => { e.preventDefault(); alert("Our standards ensure fair compensation, preservation of generational skills, and fully traceable material supplies."); }}>Verification Standards</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+export default App;
