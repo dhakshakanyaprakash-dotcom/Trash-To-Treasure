@@ -442,7 +442,7 @@ function App() {
           <div className="logo-section" onClick={() => setView({ name: 'feed', params: null })}>
             <span className="logo-mark">O</span>
             <div className="logo-text-group">
-              <h1 className="logo-title">Origins Co.</h1>
+              <h1 className="logo-title">Origins.co</h1>
               <span className="logo-tagline">Know Your Origin</span>
             </div>
           </div>
@@ -764,7 +764,7 @@ function App() {
               <aside className="feed-sidebar">
                 <div className="sidebar-widget welcome-widget">
                   <h3>Our Philosophy</h3>
-                  <p>Every handwoven weave, carved grain of wood, and terracotta kiln-fired pot holds a human history. Origins Co. ensures full provenance traceability directly from the creator's hands to yours.</p>
+                  <p>Every handwoven weave, carved grain of wood, and terracotta kiln-fired pot holds a human history. Origins.co ensures full provenance traceability directly from the creator's hands to yours.</p>
                 </div>
                 
                 <div className="sidebar-widget featured-artisans-widget">
@@ -933,7 +933,7 @@ function App() {
                         <Globe size={18} className="cert-globe" />
                         <h4>Verified Origin Certificate</h4>
                       </div>
-                      <p>Every piece is stamped with a unique physical QR certificate linking to this digital ledger of the artisan's workspace. Certified materials and localized origin verified by Origins Co. standards.</p>
+                      <p>Every piece is stamped with a unique physical QR certificate linking to this digital ledger of the artisan's workspace. Certified materials and localized origin verified by Origins.co standards.</p>
                       
                       <div className="simulated-qr-box">
                         <div className="qr-img-mock">
@@ -1159,7 +1159,7 @@ function App() {
               <section className="impact-dashboard">
                 <div className="impact-header">
                   <h2>Your Craft Support Map</h2>
-                  <p>Every transaction on Origins Co. feeds directly into the preservation of indigenous craft sectors.</p>
+                  <p>Every transaction on Origins.co feeds directly into the preservation of indigenous craft sectors.</p>
                 </div>
                 
                 <div className="impact-stats-grid">
@@ -1807,12 +1807,12 @@ function App() {
       <footer className="main-footer">
         <div className="container footer-inner">
           <div className="footer-copyright">
-            <h4>Origins Co.</h4>
+            <h4>Origins.co</h4>
             <p>Every product has an origin. Know yours.</p>
-            <span>&copy; {new Date().getFullYear()} Origins Co. All rights reserved.</span>
+            <span>&copy; {new Date().getFullYear()} Origins.co. All rights reserved.</span>
           </div>
           <div className="footer-links">
-            <a href="#about" onClick={(e) => { e.preventDefault(); alert("Origins Co. connects patrons directly with regional artisans, guaranteeing materials and provenance authenticity."); }}>About Project</a>
+            <a href="#about" onClick={(e) => { e.preventDefault(); alert("Origins.co connects patrons directly with regional artisans, guaranteeing materials and provenance authenticity."); }}>About Project</a>
             <a href="#standards" onClick={(e) => { e.preventDefault(); alert("Our standards ensure fair compensation, preservation of generational skills, and fully traceable material supplies."); }}>Verification Standards</a>
           </div>
         </div>

@@ -106,6 +106,18 @@ export const initStorage = () => {
     if (productsChanged) {
       localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(storedProducts));
     }
+
+    const storedOrders = JSON.parse(localStorage.getItem(KEYS.ORDERS) || '[]');
+    let ordersChanged = false;
+    storedOrders.forEach(so => {
+      if (so.shippingAddress && so.shippingAddress.name && (so.shippingAddress.name.includes('Madhav') || so.shippingAddress.name.includes('Madhu'))) {
+        so.shippingAddress.name = 'Aarav Sharma';
+        ordersChanged = true;
+      }
+    });
+    if (ordersChanged) {
+      localStorage.setItem(KEYS.ORDERS, JSON.stringify(storedOrders));
+    }
   } catch (_e) {
     // Ignore JSON errors
   }

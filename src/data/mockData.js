@@ -197,7 +197,7 @@ export const INITIAL_ORDERS = [
     customizationNotes: "No customization requested.",
     status: "delivered", // placed, confirmed, shipped, delivered, cancelled
     shippingAddress: {
-      name: "Madhav Sharma",
+      name: "Aarav Sharma",
       street: "12, Kasturba Gandhi Marg",
       city: "New Delhi",
       state: "Delhi",
@@ -217,7 +217,7 @@ export const INITIAL_ORDERS = [
     customizationNotes: "Please select a tray piece with heavy grain patterns.",
     status: "placed",
     shippingAddress: {
-      name: "Madhav Sharma",
+      name: "Aarav Sharma",
       street: "12, Kasturba Gandhi Marg",
       city: "New Delhi",
       state: "Delhi",

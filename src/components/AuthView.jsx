@@ -211,7 +211,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
     }
 
     if (!agreeTerms) {
-      setAlert({ type: 'error', message: 'Please agree to the Origins Co. Craft Authenticity Pledge to proceed.' });
+      setAlert({ type: 'error', message: 'Please agree to the Origins.co Craft Authenticity Pledge to proceed.' });
       return;
     }
 
@@ -357,7 +357,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
         if (regResult.success) {
           setAlert({ 
             type: 'success', 
-            message: `Gmail verified and approved! Welcome to Origins Co., ${regResult.user.name}.` 
+            message: `Gmail verified and approved! Welcome to Origins.co, ${regResult.user.name}.` 
           });
           setTimeout(() => {
             onLoginSuccess(regResult.user);
@@ -385,7 +385,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
         if (googleResult.success) {
           setAlert({ 
             type: 'success', 
-            message: `Google account approved! Welcome to Origins Co., ${googleResult.user.name}.` 
+            message: `Google account approved! Welcome to Origins.co, ${googleResult.user.name}.` 
           });
           setTimeout(() => {
             onLoginSuccess(googleResult.user);
@@ -406,7 +406,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
             {/* Header */}
             <div className="auth-header">
               <div className="auth-logo-badge">O</div>
-              <h2>Origins Co.</h2>
+              <h2>Origins.co</h2>
               <p>
                 {activeTab === 'signin' 
                   ? 'Sign in to reconnect with generational crafts & chronicles'
@@ -584,7 +584,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
                       id="signup-name"
                       name="name"
                       autoComplete="name"
-                      placeholder="e.g. Madhu Prakash"
+                      placeholder="e.g. Aarav Sharma"
                       value={signUpName}
                       onChange={(e) => setSignUpName(e.target.value)}
                       required
@@ -710,7 +710,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
                     checked={agreeTerms} 
                     onChange={(e) => setAgreeTerms(e.target.checked)} 
                   />
-                  <span>I agree to Origins Co. Craft Authenticity & Fair Terms</span>
+                  <span>I agree to Origins.co Craft Authenticity & Fair Terms</span>
                 </label>
 
                 {/* Submit Button */}
@@ -736,7 +736,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
             <div className="auth-footer">
               {activeTab === 'signin' ? (
                 <p>
-                  New to Origins Co.?{' '}
+                  New to Origins.co?{' '}
                   <button 
                     type="button" 
                     className="auth-switch-link"
@@ -809,8 +809,8 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
                 <span className="gmail-banner-time">Just now</span>
               </div>
               <div className="gmail-banner-body">
-                <strong>From:</strong> Origins Co. Verification &lt;auth@origins.co&gt;<br />
-                <strong>Subject:</strong> Your Origins Co. Account Approval OTP
+                <strong>From:</strong> Origins.co Verification &lt;auth@origins.co&gt;<br />
+                <strong>Subject:</strong> Your Origins.co Account Approval OTP
               </div>
               <div className="gmail-otp-display-row">
                 <span className="gmail-code-highlight">{activeOtpCode}</span>
@@ -925,7 +925,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
               </svg>
               <h3>Sign in with Google</h3>
-              <p>Enter your real Google / Gmail address to verify and continue to Origins Co.</p>
+              <p>Enter your real Google / Gmail address to verify and continue to Origins.co</p>
             </div>
 
             <form className="google-modal-form" onSubmit={handleGoogleSubmit}>
@@ -959,7 +959,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
                     type="text"
                     id="google-name"
                     name="name"
-                    placeholder="e.g. Madhu Prakash"
+                    placeholder="e.g. Aarav Sharma"
                     value={googleName}
                     onChange={(e) => setGoogleName(e.target.value)}
                   />
@@ -977,7 +977,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
             </form>
 
             <div className="google-modal-footer">
-              <p>Origins Co. uses Google OAuth standards with Gmail OTP verification to guarantee craft patron integrity.</p>
+              <p>Origins.co uses Google OAuth standards with Gmail OTP verification to guarantee craft patron integrity.</p>
             </div>
           </div>
         </div>
