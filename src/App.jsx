@@ -10,21 +10,28 @@ import {
   Heart, 
   MessageSquare, 
   Bookmark, 
-  PlusCircle, 
   CheckCircle, 
   Award, 
   ArrowLeft, 
   Clock, 
-  DollarSign, 
   Star, 
-  Image as ImageIcon,
-  BookOpen,
-  Calendar,
-  ChevronRight,
-  Upload,
-  Globe
+  BookOpen, 
+  Calendar, 
+  Globe, 
+  LogIn, 
+  LogOut, 
+  UserPlus
 } from 'lucide-react';
 import './App.css';
+import AuthView from './components/AuthView';
+
+const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&h=600&fit=crop&q=80';
+
+const handleImageError = (e) => {
+  if (e.target.dataset.fallbackTried) return;
+  e.target.dataset.fallbackTried = 'true';
+  e.target.src = FALLBACK_IMAGE;
+};
 
 function App() {
   // Navigation & Router
@@ -105,46 +112,42 @@ function App() {
     storage.setCart(updatedCart);
   };
 
-  // Toggle user role between Customer (Madhav) and a custom Artisan profile
-  const toggleUserRole = () => {
-    if (currentUser.role === 'customer') {
-      // Switch to an Artisan role (Ananya Sen by default)
-      const artisanUser = {
-        id: 'artisan_1',
-        role: 'artisan',
-        name: 'Ananya Sen',
-        email: 'ananya@origins.co',
-        craftTypes: ['Pottery'],
-        location: 'Kolkata, West Bengal',
-        yearsExperience: 14,
-        profilePhoto: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&q=80'
-      };
-      storage.saveCurrentUser(artisanUser);
-      setCurrentUser(artisanUser);
+  const handleLoginSuccess = (user) => {
+    setCurrentUser(user);
+    loadState();
+    if (user.role === 'artisan') {
       setView({ name: 'artisan-dashboard', params: null });
     } else {
-      // Switch back to customer (Madhav)
-      const customerUser = {
-        id: 'cust_1',
-        role: 'customer',
-        name: 'Madhav Sharma',
-        email: 'madhav@origins.co',
-        preferences: ['Pottery', 'Weaving'],
-        addresses: [
-          {
-            id: 'addr_1',
-            name: 'Madhav Sharma',
-            street: '12, Kasturba Gandhi Marg',
-            city: 'New Delhi',
-            state: 'Delhi',
-            zipCode: '110001',
-            phone: '+91 98765 43210',
-            isDefault: true
-          }
-        ]
-      };
-      storage.saveCurrentUser(customerUser);
-      setCurrentUser(customerUser);
+      setView({ name: 'feed', params: null });
+    }
+  };
+
+  const handleLogout = () => {
+    storage.logoutUser();
+    setCurrentUser(null);
+    setView({ name: 'auth', params: { tab: 'signin', message: 'You have been signed out.' } });
+  };
+
+  // Toggle user role between Customer and Artisan for current user
+  const toggleUserRole = () => {
+    if (!currentUser) {
+      setView({ name: 'auth', params: { tab: 'signin' } });
+      return;
+    }
+    const newRole = currentUser.role === 'customer' ? 'artisan' : 'customer';
+    const updatedUser = {
+      ...currentUser,
+      role: newRole,
+      craftTypes: currentUser.craftTypes || ['Handmade Craft'],
+      location: currentUser.location || 'India',
+      yearsExperience: currentUser.yearsExperience || 3
+    };
+    storage.saveCurrentUser(updatedUser);
+    setCurrentUser(updatedUser);
+    loadState();
+    if (newRole === 'artisan') {
+      setView({ name: 'artisan-dashboard', params: null });
+    } else {
       setView({ name: 'feed', params: null });
     }
   };
@@ -170,7 +173,11 @@ function App() {
   };
 
   const handleFollow = (artisanId) => {
-    const isFollowed = storage.toggleFollow(currentUser.id, artisanId);
+    if (!currentUser) {
+      setView({ name: 'auth', params: { tab: 'signin', message: 'Please sign in to follow artisans.' } });
+      return;
+    }
+    storage.toggleFollow(currentUser.id, artisanId);
     setFollows(storage.getFollows());
   };
 
@@ -181,6 +188,10 @@ function App() {
 
   const handleAddComment = (postId) => {
     if (!commentInput.trim()) return;
+    if (!currentUser) {
+      setView({ name: 'auth', params: { tab: 'signin', message: 'Please sign in to join the conversation.' } });
+      return;
+    }
     const postToUpdate = posts.find(p => p.id === postId);
     if (!postToUpdate) return;
 
@@ -201,7 +212,21 @@ function App() {
   // Customer Checkout
   const handleCheckout = (e) => {
     e.preventDefault();
+    if (!currentUser) {
+      setView({ name: 'auth', params: { tab: 'signin', message: 'Please sign in or create an account to complete checkout.' } });
+      return;
+    }
     if (cart.length === 0) return;
+
+    const defaultAddress = currentUser.addresses?.[0] || {
+      id: 'addr_default',
+      name: currentUser.name,
+      street: '12, Kasturba Gandhi Marg',
+      city: 'New Delhi',
+      state: 'Delhi',
+      zipCode: '110001',
+      phone: currentUser.phone || '+91 98765 43210'
+    };
 
     // Create orders for each artisan's product in the cart
     cart.forEach(item => {
@@ -214,7 +239,7 @@ function App() {
         price: item.price,
         customizationNotes: item.customizationNotes || 'Standard order.',
         status: 'placed', // placed, confirmed, shipped, delivered, cancelled
-        shippingAddress: currentUser.addresses[0],
+        shippingAddress: defaultAddress,
         paymentStatus: 'paid',
         createdAt: new Date().toISOString()
       };
@@ -366,7 +391,7 @@ function App() {
       craftTypes: [artisanOnboardData.craftTypes],
       location: artisanOnboardData.location,
       yearsExperience: parseInt(artisanOnboardData.yearsExperience),
-      coverPhoto: artisanOnboardData.coverPhoto || 'https://images.unsplash.com/photo-1595273670150-db0d3bf3b765?w=1200&h=400&fit=crop&q=80'
+      coverPhoto: artisanOnboardData.coverPhoto || 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=1200&h=400&fit=crop&q=80'
     };
     storage.saveCurrentUser(updatedUser);
     setCurrentUser(updatedUser);
@@ -409,8 +434,6 @@ function App() {
     return postArtisan?.craftTypes.some(c => c.toLowerCase() === selectedCategory.toLowerCase());
   });
 
-  if (!currentUser) return <div className="loading">Gathering stories...</div>;
-
   return (
     <div className="app-container">
       {/* Header Chrome (Quiet & Clean) */}
@@ -438,24 +461,16 @@ function App() {
               Market
             </button>
             
-            {currentUser.role === 'customer' ? (
-              <>
-                <button 
-                  className={`nav-link ${view.name === 'customer-dashboard' ? 'active' : ''}`}
-                  onClick={() => setView({ name: 'customer-dashboard', params: null })}
-                >
-                  My Patronage
-                </button>
-                <button 
-                  className={`nav-link cart-btn ${view.name === 'cart' ? 'active' : ''}`}
-                  onClick={() => setView({ name: 'cart', params: null })}
-                  aria-label="View Cart"
-                >
-                  <ShoppingCart size={18} />
-                  {cart.length > 0 && <span className="cart-badge">{cart.reduce((s, i) => s + i.quantity, 0)}</span>}
-                </button>
-              </>
-            ) : (
+            {currentUser && currentUser.role === 'customer' && (
+              <button 
+                className={`nav-link ${view.name === 'customer-dashboard' ? 'active' : ''}`}
+                onClick={() => setView({ name: 'customer-dashboard', params: null })}
+              >
+                My Patronage
+              </button>
+            )}
+
+            {currentUser && currentUser.role === 'artisan' && (
               <button 
                 className={`nav-link ${view.name === 'artisan-dashboard' ? 'active' : ''}`}
                 onClick={() => setView({ name: 'artisan-dashboard', params: null })}
@@ -463,16 +478,62 @@ function App() {
                 Artisan Studio
               </button>
             )}
+
+            <button 
+              className={`nav-link cart-btn ${view.name === 'cart' ? 'active' : ''}`}
+              onClick={() => setView({ name: 'cart', params: null })}
+              aria-label="View Cart"
+            >
+              <ShoppingCart size={18} />
+              {cart.length > 0 && <span className="cart-badge">{cart.reduce((s, i) => s + i.quantity, 0)}</span>}
+            </button>
           </nav>
 
           <div className="role-switch-zone">
-            <div className="user-indicator">
-              <User size={14} />
-              <span>{currentUser.name} ({currentUser.role})</span>
-            </div>
-            <button className="btn btn-secondary btn-small" onClick={toggleUserRole}>
-              Switch Mode
-            </button>
+            {currentUser ? (
+              <>
+                <div className="user-indicator">
+                  <User size={14} />
+                  <span>{currentUser.name} ({currentUser.role})</span>
+                </div>
+                <button className="btn btn-secondary btn-small" onClick={toggleUserRole} title="Switch between Customer and Artisan view">
+                  Switch Mode
+                </button>
+                <button 
+                  className="btn btn-secondary btn-small" 
+                  onClick={() => setView({ name: 'auth', params: { tab: 'signin' } })}
+                  title="Switch account"
+                >
+                  <LogIn size={13} />
+                  <span>Switch</span>
+                </button>
+                <button 
+                  className="btn btn-secondary btn-small" 
+                  onClick={handleLogout}
+                  title="Sign Out"
+                >
+                  <LogOut size={13} />
+                  <span>Sign Out</span>
+                </button>
+              </>
+            ) : (
+              <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                <button 
+                  className={`btn ${view.name === 'auth' && view.params?.tab === 'signin' ? 'btn-primary' : 'btn-secondary'} btn-small`}
+                  onClick={() => setView({ name: 'auth', params: { tab: 'signin' } })}
+                >
+                  <LogIn size={14} />
+                  <span>Sign In</span>
+                </button>
+                <button 
+                  className={`btn ${view.name === 'auth' && view.params?.tab === 'signup' ? 'btn-primary' : 'btn-secondary'} btn-small`}
+                  onClick={() => setView({ name: 'auth', params: { tab: 'signup' } })}
+                >
+                  <UserPlus size={14} />
+                  <span>Sign Up</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -498,6 +559,16 @@ function App() {
             </div>
           )}
 
+          {/* VIEW: AUTHENTICATION (SIGN IN & SIGN UP) */}
+          {(view.name === 'auth' || view.name === 'login') && (
+            <AuthView 
+              onLoginSuccess={handleLoginSuccess}
+              onGuestContinue={() => setView({ name: 'feed', params: null })}
+              initialTab={view.params?.tab || 'signin'}
+              bannerMessage={view.params?.message || ''}
+            />
+          )}
+
           {/* VIEW: STORIES FEED */}
           {view.name === 'feed' && (
             <div className="feed-view-layout fade-in">
@@ -521,7 +592,12 @@ function App() {
                             className="artisan-meta-trigger"
                             onClick={() => setView({ name: 'artisan-profile', params: post.artisanId })}
                           >
-                            <img src={postArtisan?.profilePhoto} alt={postArtisan?.displayName} className="avatar-img" />
+                            <img 
+                              src={postArtisan?.profilePhoto} 
+                              alt={postArtisan?.displayName} 
+                              className="avatar-img" 
+                              onError={handleImageError}
+                            />
                             <div className="artisan-details">
                               <h3 className="artisan-name">{postArtisan?.displayName}</h3>
                               <span className="artisan-loc"><MapPin size={12} /> {postArtisan?.location}</span>
@@ -550,7 +626,12 @@ function App() {
 
                         {/* Card Media (Carousel / Static) */}
                         <div className="card-media">
-                          <img src={post.media[0]} alt="Post visual content" className="post-main-image" />
+                          <img 
+                            src={post.media[0]} 
+                            alt="Post visual content" 
+                            className="post-main-image" 
+                            onError={handleImageError}
+                          />
                           
                           {post.type === 'making_diary' && (
                             <div className="making-diary-banner">
@@ -609,7 +690,7 @@ function App() {
                                     </div>
                                     <div className="timeline-content-card">
                                       <div className="timeline-img-wrap">
-                                        <img src={entry.media} alt={entry.title} />
+                                        <img src={entry.media} alt={entry.title} onError={handleImageError} />
                                       </div>
                                       <div className="timeline-details">
                                         <h5>{entry.title}</h5>
@@ -626,7 +707,7 @@ function App() {
                           {linkedProduct && (
                             <div className="linked-product-card">
                               <div className="linked-prod-img-wrap">
-                                <img src={linkedProduct.images[0]} alt={linkedProduct.title} />
+                                <img src={linkedProduct.images[0]} alt={linkedProduct.title} onError={handleImageError} />
                               </div>
                               <div className="linked-prod-details">
                                 <span className="product-category-tag">{linkedProduct.category}</span>
@@ -695,7 +776,7 @@ function App() {
                         className="featured-art-item"
                         onClick={() => setView({ name: 'artisan-profile', params: art.id })}
                       >
-                        <img src={art.profilePhoto} alt={art.displayName} />
+                        <img src={art.profilePhoto} alt={art.displayName} onError={handleImageError} />
                         <div className="feat-details">
                           <h4>{art.displayName}</h4>
                           <span>{art.location}</span>
@@ -732,7 +813,7 @@ function App() {
                         onClick={() => setView({ name: 'product-detail', params: prod.id })}
                       >
                         <div className="prod-card-image-wrap">
-                          <img src={prod.images[0]} alt={prod.title} />
+                          <img src={prod.images[0]} alt={prod.title} onError={handleImageError} />
                           {prod.isMadeToOrder && (
                             <span className="order-type-badge">Made to Order</span>
                           )}
@@ -775,13 +856,13 @@ function App() {
                   {/* Media Gallery Col */}
                   <div className="detail-media-gallery">
                     <div className="main-image-wrap">
-                      <img src={product.images[0]} alt={product.title} />
+                      <img src={product.images[0]} alt={product.title} onError={handleImageError} />
                     </div>
                     {product.images.length > 1 && (
                       <div className="secondary-images-strip">
                         {product.images.slice(1).map((img, idx) => (
                           <div key={idx} className="secondary-image-wrap">
-                            <img src={img} alt={`${product.title} secondary`} />
+                            <img src={img} alt={`${product.title} secondary`} onError={handleImageError} />
                           </div>
                         ))}
                       </div>
@@ -830,7 +911,7 @@ function App() {
                     </div>
 
                     <div className="buy-button-wrapper">
-                      {currentUser.role === 'customer' ? (
+                      {(!currentUser || currentUser.role === 'customer') ? (
                         <button 
                           className="btn btn-primary btn-large btn-full-width"
                           onClick={() => addToCart(product)}
@@ -882,7 +963,7 @@ function App() {
                       <div className="made-by-body-grid">
                         {/* Bio & Face */}
                         <div className="mb-profile-col">
-                          <img src={artisanInfo?.profilePhoto} alt={artisanInfo?.displayName} className="mb-avatar" />
+                          <img src={artisanInfo?.profilePhoto} alt={artisanInfo?.displayName} className="mb-avatar" onError={handleImageError} />
                           <div className="mb-meta">
                             <h3>{artisanInfo?.displayName}</h3>
                             <span className="mb-loc"><MapPin size={12} /> {artisanInfo?.location}</span>
@@ -942,7 +1023,7 @@ function App() {
                           {rev.images && rev.images.length > 0 && (
                             <div className="review-images-grid">
                               {rev.images.map((img, idx) => (
-                                <img key={idx} src={img} alt="Customer product snapshot" className="review-snapshot-img" />
+                                <img key={idx} src={img} alt="Customer product snapshot" className="review-snapshot-img" onError={handleImageError} />
                               ))}
                             </div>
                           )}
@@ -978,7 +1059,7 @@ function App() {
                       return (
                         <div key={item.id} className="cart-item-row">
                           <div className="cart-item-img-wrap">
-                            <img src={item.images[0]} alt={item.title} />
+                            <img src={item.images[0]} alt={item.title} onError={handleImageError} />
                           </div>
                           <div className="cart-item-details">
                             <h3 className="cart-item-title">{item.title}</h3>
@@ -1019,19 +1100,35 @@ function App() {
 
                     <form onSubmit={handleCheckout} className="checkout-form-element">
                       <h4 className="form-section-title">Delivery Address</h4>
-                      <div className="saved-address-card">
-                        <strong>{currentUser.addresses[0]?.name}</strong>
-                        <p>{currentUser.addresses[0]?.street}</p>
-                        <p>{currentUser.addresses[0]?.city}, {currentUser.addresses[0]?.state} - {currentUser.addresses[0]?.zipCode}</p>
-                        <p>Phone: {currentUser.addresses[0]?.phone}</p>
-                      </div>
+                      {currentUser ? (
+                        <div className="saved-address-card">
+                          <strong>{currentUser.addresses?.[0]?.name || currentUser.name}</strong>
+                          <p>{currentUser.addresses?.[0]?.street || 'Main Craft Way'}</p>
+                          <p>{currentUser.addresses?.[0]?.city || 'New Delhi'}, {currentUser.addresses?.[0]?.state || 'Delhi'} - {currentUser.addresses?.[0]?.zipCode || '110001'}</p>
+                          <p>Phone: {currentUser.addresses?.[0]?.phone || currentUser.phone || '+91 98765 43210'}</p>
+                        </div>
+                      ) : (
+                        <div className="saved-address-card" style={{ textAlign: 'center', padding: '1.25rem' }}>
+                          <p style={{ marginBottom: '0.6rem', color: 'var(--color-charcoal-muted)', fontSize: '0.88rem' }}>
+                            Please sign in or create an account to provide shipping details and confirm order.
+                          </p>
+                          <button 
+                            type="button" 
+                            className="btn btn-secondary btn-small"
+                            onClick={() => setView({ name: 'auth', params: { tab: 'signin', message: 'Sign in to complete your checkout.' } })}
+                          >
+                            <LogIn size={14} />
+                            <span>Sign In / Register</span>
+                          </button>
+                        </div>
+                      )}
 
                       <div className="payment-simulation-notice">
                         <p>Simulating Razorpay/Stripe checkout. No actual money will be charged.</p>
                       </div>
 
                       <button type="submit" className="btn btn-primary btn-large btn-full-width">
-                        Confirm & Place Order
+                        {currentUser ? 'Confirm & Place Order' : 'Sign In & Place Order'}
                       </button>
                     </form>
                   </div>
@@ -1042,8 +1139,23 @@ function App() {
 
           {/* VIEW: CUSTOMER DASHBOARD */}
           {view.name === 'customer-dashboard' && (
-            <div className="customer-dashboard-layout fade-in">
-              {/* IMPACT DASHBOARD SECTION (Core loop value) */}
+            !currentUser ? (
+              <div className="empty-state" style={{ padding: '3.5rem 1rem', textAlign: 'center' }}>
+                <User size={48} className="empty-icon" />
+                <h3>Patronage Dashboard</h3>
+                <p>Please sign in to view your craft support map, patronage impact, and orders.</p>
+                <button 
+                  className="btn btn-primary" 
+                  style={{ marginTop: '1.25rem' }} 
+                  onClick={() => setView({ name: 'auth', params: { tab: 'signin' } })}
+                >
+                  <LogIn size={16} />
+                  <span>Sign In</span>
+                </button>
+              </div>
+            ) : (
+              <div className="customer-dashboard-layout fade-in">
+                {/* IMPACT DASHBOARD SECTION (Core loop value) */}
               <section className="impact-dashboard">
                 <div className="impact-header">
                   <h2>Your Craft Support Map</h2>
@@ -1089,7 +1201,7 @@ function App() {
 
                           <div className="order-ledger-body">
                             <div className="order-product-info">
-                              <img src={orderProd?.images[0]} alt={orderProd?.title} className="order-thumbnail-img" />
+                              <img src={orderProd?.images[0]} alt={orderProd?.title} className="order-thumbnail-img" onError={handleImageError} />
                               <div className="order-prod-meta">
                                 <h4>{orderProd?.title}</h4>
                                 <span>Artisan: {orderArt?.displayName}</span>
@@ -1168,15 +1280,32 @@ function App() {
                 )}
               </section>
             </div>
-          )}
+          ))}
 
           {/* VIEW: ARTISAN STUDIO DASHBOARD */}
           {view.name === 'artisan-dashboard' && (
-            <div className="artisan-dashboard-layout fade-in">
-              <div className="studio-header">
-                <h2>Artisan Studio</h2>
-                <p>Add products, share raw workshops stories, and check order requests.</p>
+            !currentUser ? (
+              <div className="empty-state" style={{ padding: '3.5rem 1rem', textAlign: 'center' }}>
+                <User size={48} className="empty-icon" />
+                <h3>Artisan Studio Sign-In Required</h3>
+                <p>Sign in with your master artisan account to manage inventory, fulfill craft orders, and log chronicles.</p>
+                <div style={{ marginTop: '1.25rem', display: 'flex', gap: '0.6rem', justifyContent: 'center' }}>
+                  <button className="btn btn-primary" onClick={() => setView({ name: 'auth', params: { tab: 'signin' } })}>
+                    <LogIn size={16} />
+                    <span>Sign In</span>
+                  </button>
+                  <button className="btn btn-secondary" onClick={() => setView({ name: 'auth', params: { tab: 'signup' } })}>
+                    <UserPlus size={16} />
+                    <span>Join as Artisan</span>
+                  </button>
+                </div>
               </div>
+            ) : (
+              <div className="artisan-dashboard-layout fade-in">
+                <div className="studio-header">
+                  <h2>Artisan Studio</h2>
+                  <p>Add products, share raw workshops stories, and check order requests.</p>
+                </div>
 
               {/* Sub-navigation inside studio */}
               <div className="studio-sub-nav">
@@ -1267,7 +1396,7 @@ function App() {
                     <div className="studio-card profile-card">
                       <h3>Studio Profile</h3>
                       <div className="studio-profile-meta">
-                        <img src={currentUser.profilePhoto} alt={currentUser.name} className="studio-profile-avatar" />
+                        <img src={currentUser.profilePhoto} alt={currentUser.name} className="studio-profile-avatar" onError={handleImageError} />
                         <div>
                           <h4>{currentUser.name}</h4>
                           <p>{currentUser.location}</p>
@@ -1288,7 +1417,7 @@ function App() {
                       <div className="studio-products-list">
                         {products.filter(p => p.artisanId === currentUser.id).map(p => (
                           <div key={p.id} className="studio-product-item">
-                            <img src={p.images[0]} alt={p.title} />
+                            <img src={p.images[0]} alt={p.title} onError={handleImageError} />
                             <div>
                               <h4>{p.title}</h4>
                               <span>Stock: {p.stock} | Price: ₹{p.price}</span>
@@ -1569,7 +1698,7 @@ function App() {
                 </div>
               )}
             </div>
-          )}
+          ))}
 
           {/* VIEW: ARTISAN PUBLIC PROFILE */}
           {view.name === 'artisan-profile' && (() => {
@@ -1583,12 +1712,12 @@ function App() {
               <div className="artisan-profile-view fade-in">
                 {/* Profile Cover & Header Banner */}
                 <div className="profile-cover-banner">
-                  <img src={artisan.coverPhoto} alt="Artisan workspace cover" />
+                  <img src={artisan.coverPhoto} alt="Artisan workspace cover" onError={handleImageError} />
                 </div>
 
                 <div className="profile-header-details">
                   <div className="header-meta-row">
-                    <img src={artisan.profilePhoto} alt={artisan.displayName} className="profile-large-avatar" />
+                    <img src={artisan.profilePhoto} alt={artisan.displayName} className="profile-large-avatar" onError={handleImageError} />
                     <div className="header-text-block">
                       <div className="title-and-tier">
                         <h2>{artisan.displayName}</h2>
@@ -1607,7 +1736,7 @@ function App() {
                     </div>
 
                     <div className="profile-follow-zone">
-                      {currentUser.role === 'customer' && (
+                      {(!currentUser || currentUser.role === 'customer') && (
                         <button 
                           className={`btn ${isFollowing(artisan.id) ? 'btn-secondary' : 'btn-primary'}`}
                           onClick={() => handleFollow(artisan.id)}
@@ -1638,7 +1767,7 @@ function App() {
                         onClick={() => setView({ name: 'product-detail', params: p.id })}
                       >
                         <div className="prod-card-image-wrap">
-                          <img src={p.images[0]} alt={p.title} />
+                          <img src={p.images[0]} alt={p.title} onError={handleImageError} />
                         </div>
                         <div className="prod-card-meta">
                           <h4 className="prod-card-title">{p.title}</h4>
@@ -1659,7 +1788,7 @@ function App() {
                         className="profile-post-thumbnail"
                         onClick={() => setView({ name: 'feed', params: null })} // Redirect to feed to read
                       >
-                        <img src={post.media[0]} alt="Process diary image" />
+                        <img src={post.media[0]} alt="Process diary image" onError={handleImageError} />
                         <div className="post-thumbnail-overlay">
                           <p>{post.caption.substring(0, 60)}...</p>
                         </div>

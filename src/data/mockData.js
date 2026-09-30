@@ -8,7 +8,7 @@ export const INITIAL_ARTISANS = [
     yearsExperience: 14,
     verificationTier: "master", // new, verified, master, heritage_keeper
     profilePhoto: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&q=80",
-    coverPhoto: "https://images.unsplash.com/photo-1595273670150-db0d3bf3b765?w=1200&h=400&fit=crop&q=80",
+    coverPhoto: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=1200&h=600&fit=crop&q=80",
     payoutDetails: "GPay / UPI: ananyasen@oksbi",
     joinedDate: "2024-02-15"
   },
@@ -21,7 +21,7 @@ export const INITIAL_ARTISANS = [
     yearsExperience: 22,
     verificationTier: "heritage_keeper",
     profilePhoto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&q=80",
-    coverPhoto: "https://images.unsplash.com/photo-1617806118233-18e1db207f62?w=1200&h=400&fit=crop&q=80",
+    coverPhoto: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=1200&h=600&fit=crop&q=80",
     payoutDetails: "UPI: kabirweaver@okaxis",
     joinedDate: "2023-11-10"
   },
@@ -34,7 +34,7 @@ export const INITIAL_ARTISANS = [
     yearsExperience: 8,
     verificationTier: "verified",
     profilePhoto: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&q=80",
-    coverPhoto: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&h=400&fit=crop&q=80",
+    coverPhoto: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&h=600&fit=crop&q=80",
     payoutDetails: "UPI: meeracrafts@okicici",
     joinedDate: "2024-05-01"
   }
@@ -54,7 +54,7 @@ export const INITIAL_PRODUCTS = [
     craftTechnique: "Wheel-thrown, pit-fired terracotta",
     images: [
       "https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?w=800&h=600&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1576016770956-debb63d900ef?w=800&h=600&fit=crop&q=80"
+      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800&h=600&fit=crop&q=80"
     ],
     isMadeToOrder: false,
     status: "active"
@@ -108,7 +108,7 @@ export const INITIAL_PRODUCTS = [
     craftTechnique: "Gouge-carving and hand-planing",
     images: [
       "https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?w=800&h=600&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1590794056226-79ef3a814c97?w=800&h=600&fit=crop&q=80"
+      "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=800&h=600&fit=crop&q=80"
     ],
     isMadeToOrder: false,
     status: "active"
@@ -121,7 +121,7 @@ export const INITIAL_POSTS = [
     artisanId: "artisan_1",
     type: "making_diary", // photo, video, making_diary
     media: [
-      "https://images.unsplash.com/photo-1565192647048-f997ed87f5e2?w=800&h=600&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&h=600&fit=crop&q=80",
       "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=800&h=600&fit=crop&q=80"
     ],
     caption: "Working on the new summer terracotta collection. Clay prep is where the soul of the pottery lies.",
@@ -139,7 +139,7 @@ export const INITIAL_POSTS = [
       {
         dayNumber: 1,
         title: "Clay Preparation & Wedging",
-        media: "https://images.unsplash.com/photo-1565192647048-f997ed87f5e2?w=600&h=450&fit=crop&q=80",
+        media: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=600&h=450&fit=crop&q=80",
         caption: "Removing air pockets from the wet silt clay through a circular wedging pattern. The consistency needs to feel like stiff bread dough."
       },
       {
@@ -151,7 +151,7 @@ export const INITIAL_POSTS = [
       {
         dayNumber: 3,
         title: "Trim & Firing",
-        media: "https://images.unsplash.com/photo-1595273670150-db0d3bf3b765?w=600&h=450&fit=crop&q=80",
+        media: "https://images.unsplash.com/photo-1590736969955-71cc94801759?w=600&h=450&fit=crop&q=80",
         caption: "Entering the wood-fired kiln. We keep it burning at 950°C for 12 hours straight using oak wood shavings."
       }
     ]
@@ -160,7 +160,7 @@ export const INITIAL_POSTS = [
     id: "post_2",
     artisanId: "artisan_2",
     type: "photo",
-    media: ["https://images.unsplash.com/photo-1617806118233-18e1db207f62?w=800&h=600&fit=crop&q=80"],
+    media: ["https://images.unsplash.com/photo-1606744824163-985d376605aa?w=800&h=600&fit=crop&q=80"],
     caption: "Setting up the warp for the Indigo Herringbone throws. 480 individual threads aligned by eye.",
     craftStory: "Warping is the most meditative part of weaving. Each thread of unbleached linen must be threaded through its specific heddle in the harness. One single error here would ruin the diagonal symmetry of the herringbone weave.",
     linkedProductId: "prod_3",

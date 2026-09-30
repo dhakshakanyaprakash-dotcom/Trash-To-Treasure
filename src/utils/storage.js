@@ -14,7 +14,8 @@ const KEYS = {
   REVIEWS: 'origins_reviews',
   CURRENT_USER: 'origins_current_user',
   FOLLOWS: 'origins_follows',
-  CART: 'origins_cart'
+  CART: 'origins_cart',
+  USERS: 'origins_users'
 };
 
 // Initialize Storage with mock data if empty
@@ -35,33 +36,81 @@ export const initStorage = () => {
     localStorage.setItem(KEYS.REVIEWS, JSON.stringify(INITIAL_REVIEWS));
   }
   if (!localStorage.getItem(KEYS.FOLLOWS)) {
-    // Seed initial follow: default customer following artisan_1
-    localStorage.setItem(KEYS.FOLLOWS, JSON.stringify([
-      { followerId: 'cust_1', followingId: 'artisan_1' }
-    ]));
+    localStorage.setItem(KEYS.FOLLOWS, JSON.stringify([]));
   }
-  if (!localStorage.getItem(KEYS.CURRENT_USER)) {
-    // Default logged in user is a customer 'cust_1'
-    const defaultUser = {
-      id: 'cust_1',
-      role: 'customer', // customer, artisan
-      name: 'Madhav Sharma',
-      email: 'madhav@origins.co',
-      preferences: ['Pottery', 'Weaving'],
-      addresses: [
-        {
-          id: 'addr_1',
-          name: 'Madhav Sharma',
-          street: '12, Kasturba Gandhi Marg',
-          city: 'New Delhi',
-          state: 'Delhi',
-          zipCode: '110001',
-          phone: '+91 98765 43210',
-          isDefault: true
+  if (!localStorage.getItem(KEYS.USERS)) {
+    localStorage.setItem(KEYS.USERS, JSON.stringify([]));
+  }
+  // Automatically clean out legacy demo accounts
+  try {
+    const existingUsers = JSON.parse(localStorage.getItem(KEYS.USERS) || '[]');
+    const realUsersOnly = existingUsers.filter(u => u.id !== 'cust_1' && u.id !== 'artisan_1');
+    if (realUsersOnly.length !== existingUsers.length) {
+      localStorage.setItem(KEYS.USERS, JSON.stringify(realUsersOnly));
+    }
+    const current = JSON.parse(localStorage.getItem(KEYS.CURRENT_USER) || 'null');
+    if (current && (current.id === 'cust_1' || current.id === 'artisan_1')) {
+      localStorage.setItem(KEYS.CURRENT_USER, JSON.stringify(null));
+    }
+
+    // Automatically heal/sync any cached 404 or outdated image URLs in localStorage
+    const storedPosts = JSON.parse(localStorage.getItem(KEYS.POSTS) || '[]');
+    let postsChanged = false;
+    storedPosts.forEach(sp => {
+      const initial = INITIAL_POSTS.find(ip => ip.id === sp.id);
+      if (initial) {
+        if (JSON.stringify(sp.media) !== JSON.stringify(initial.media)) {
+          sp.media = initial.media;
+          postsChanged = true;
         }
-      ]
-    };
-    localStorage.setItem(KEYS.CURRENT_USER, JSON.stringify(defaultUser));
+        if (JSON.stringify(sp.diaryEntries) !== JSON.stringify(initial.diaryEntries)) {
+          sp.diaryEntries = initial.diaryEntries;
+          postsChanged = true;
+        }
+      }
+    });
+    if (postsChanged) {
+      localStorage.setItem(KEYS.POSTS, JSON.stringify(storedPosts));
+    }
+
+    const storedArtisans = JSON.parse(localStorage.getItem(KEYS.ARTISANS) || '[]');
+    let artisansChanged = false;
+    storedArtisans.forEach(sa => {
+      const initial = INITIAL_ARTISANS.find(ia => ia.id === sa.id);
+      if (initial) {
+        if (sa.profilePhoto !== initial.profilePhoto) {
+          sa.profilePhoto = initial.profilePhoto;
+          artisansChanged = true;
+        }
+        if (sa.coverPhoto !== initial.coverPhoto) {
+          sa.coverPhoto = initial.coverPhoto;
+          artisansChanged = true;
+        }
+      }
+    });
+    if (artisansChanged) {
+      localStorage.setItem(KEYS.ARTISANS, JSON.stringify(storedArtisans));
+    }
+
+    const storedProducts = JSON.parse(localStorage.getItem(KEYS.PRODUCTS) || '[]');
+    let productsChanged = false;
+    storedProducts.forEach(sp => {
+      const initial = INITIAL_PRODUCTS.find(ip => ip.id === sp.id);
+      if (initial) {
+        if (JSON.stringify(sp.images) !== JSON.stringify(initial.images)) {
+          sp.images = initial.images;
+          productsChanged = true;
+        }
+      }
+    });
+    if (productsChanged) {
+      localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(storedProducts));
+    }
+  } catch (_e) {
+    // Ignore JSON errors
+  }
+  if (localStorage.getItem(KEYS.CURRENT_USER) === null) {
+    localStorage.setItem(KEYS.CURRENT_USER, JSON.stringify(null));
   }
   if (!localStorage.getItem(KEYS.CART)) {
     localStorage.setItem(KEYS.CART, JSON.stringify([]));
@@ -198,7 +247,179 @@ export const storage = {
   setCart: (cart) => {
     set(KEYS.CART, cart);
   },
-  
+
+  getUsers: () => get(KEYS.USERS),
+
+  findUser: (identifier) => {
+    const users = get(KEYS.USERS);
+    if (!identifier) return null;
+    const cleanId = identifier.trim().toLowerCase();
+    const cleanPhone = cleanId.replace(/\D/g, '');
+    return users.find(u => {
+      const userEmail = (u.email || '').toLowerCase();
+      const userPhone = (u.phone || '').replace(/\D/g, '');
+      if (userEmail === cleanId) return true;
+      if (cleanPhone.length >= 7 && userPhone.includes(cleanPhone)) return true;
+      return false;
+    });
+  },
+
+  authenticateUser: (identifier, password) => {
+    initStorage();
+    const user = storage.findUser(identifier);
+    if (!user) {
+      return { success: false, error: 'No account found with this email or phone number. Please sign up.' };
+    }
+    if (user.password && user.password !== password) {
+      return { success: false, error: 'Incorrect password. Please verify and try again.' };
+    }
+    storage.saveCurrentUser(user);
+    return { success: true, user };
+  },
+
+  // Gmail OTP Generation & Verification
+  generateOtp: (email) => {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    // 6-digit cryptographic-style OTP
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = Date.now() + 5 * 60 * 1000; // 5 mins validity
+    const otps = JSON.parse(localStorage.getItem('origins_otps') || '{}');
+    otps[cleanEmail] = { code, expiry, createdAt: Date.now() };
+    localStorage.setItem('origins_otps', JSON.stringify(otps));
+    return code;
+  },
+
+  getLatestOtp: (email) => {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const otps = JSON.parse(localStorage.getItem('origins_otps') || '{}');
+    const record = otps[cleanEmail];
+    if (record && Date.now() <= record.expiry) {
+      return record.code;
+    }
+    return null;
+  },
+
+  verifyOtp: (email, code) => {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const otps = JSON.parse(localStorage.getItem('origins_otps') || '{}');
+    const record = otps[cleanEmail];
+    if (!record) {
+      return { success: false, error: 'No verification code requested for this Gmail address. Please request a new code.' };
+    }
+    if (Date.now() > record.expiry) {
+      return { success: false, error: 'Verification code has expired. Please request a new code.' };
+    }
+    if (record.code !== (code || '').trim()) {
+      return { success: false, error: 'Invalid 6-digit verification code. Please check your email and try again.' };
+    }
+    delete otps[cleanEmail];
+    localStorage.setItem('origins_otps', JSON.stringify(otps));
+    return { success: true };
+  },
+
+  registerUser: ({ name, email, phone, password, role = 'customer', isVerified = false }) => {
+    initStorage();
+    const users = get(KEYS.USERS) || [];
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanPhone = (phone || '').trim();
+
+    // Check if user already exists
+    const existing = users.find(u => {
+      const uEmail = (u.email || '').toLowerCase();
+      const uPhone = (u.phone || '').replace(/\D/g, '');
+      const inputPhone = cleanPhone.replace(/\D/g, '');
+      return uEmail === cleanEmail || (inputPhone && uPhone === inputPhone);
+    });
+
+    if (existing) {
+      return { success: false, error: 'An account with this email or phone already exists. Please sign in.' };
+    }
+
+    const newId = role === 'artisan' ? `artisan_${Date.now()}` : `user_${Date.now()}`;
+    const newUser = {
+      id: newId,
+      role,
+      name: name.trim(),
+      email: cleanEmail,
+      phone: cleanPhone,
+      password,
+      isVerified,
+      emailVerifiedAt: isVerified ? new Date().toISOString() : null,
+      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name.trim())}&backgroundColor=d4724c`,
+      preferences: ['Pottery', 'Weaving'],
+      addresses: [
+        {
+          id: `addr_${Date.now()}`,
+          name: name.trim(),
+          street: 'Main Craft Boulevard',
+          city: 'New Delhi',
+          state: 'Delhi',
+          zipCode: '110001',
+          phone: cleanPhone,
+          isDefault: true
+        }
+      ],
+      createdAt: new Date().toISOString()
+    };
+
+    users.push(newUser);
+    set(KEYS.USERS, users);
+    storage.saveCurrentUser(newUser);
+    return { success: true, user: newUser };
+  },
+
+  loginWithGoogle: ({ name, email, avatar, role = 'customer' }) => {
+    initStorage();
+    const users = get(KEYS.USERS) || [];
+    const cleanEmail = (email || '').trim().toLowerCase();
+    let user = users.find(u => (u.email || '').toLowerCase() === cleanEmail);
+
+    if (!user) {
+      const newId = role === 'artisan' ? `artisan_${Date.now()}` : `user_${Date.now()}`;
+      user = {
+        id: newId,
+        role,
+        name: name || cleanEmail.split('@')[0],
+        email: cleanEmail,
+        phone: '',
+        password: null,
+        provider: 'google',
+        isVerified: true,
+        emailVerifiedAt: new Date().toISOString(),
+        avatar: avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name || cleanEmail)}&backgroundColor=4285F4`,
+        preferences: ['Pottery', 'Weaving', 'Jewelry'],
+        addresses: [
+          {
+            id: `addr_${Date.now()}`,
+            name: name || cleanEmail.split('@')[0],
+            street: 'Craft Enclave',
+            city: 'New Delhi',
+            state: 'Delhi',
+            zipCode: '110001',
+            phone: '',
+            isDefault: true
+          }
+        ],
+        createdAt: new Date().toISOString()
+      };
+      users.push(user);
+      set(KEYS.USERS, users);
+    } else {
+      user.isVerified = true;
+      user.emailVerifiedAt = user.emailVerifiedAt || new Date().toISOString();
+      const idx = users.findIndex(u => u.id === user.id);
+      if (idx >= 0) users[idx] = user;
+      set(KEYS.USERS, users);
+    }
+
+    storage.saveCurrentUser(user);
+    return { success: true, user };
+  },
+
+  logoutUser: () => {
+    localStorage.setItem(KEYS.CURRENT_USER, JSON.stringify(null));
+  },
+
   clearAll: () => {
     localStorage.removeItem(KEYS.ARTISANS);
     localStorage.removeItem(KEYS.PRODUCTS);
@@ -208,6 +429,7 @@ export const storage = {
     localStorage.removeItem(KEYS.CURRENT_USER);
     localStorage.removeItem(KEYS.FOLLOWS);
     localStorage.removeItem(KEYS.CART);
+    localStorage.removeItem(KEYS.USERS);
     initStorage();
   }
 };
