@@ -211,7 +211,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
     }
 
     if (!agreeTerms) {
-      setAlert({ type: 'error', message: 'Please agree to the Origins.co Craft Authenticity Pledge to proceed.' });
+      setAlert({ type: 'error', message: 'Please agree to the T2T (Trash to Treasure) Craft Authenticity Pledge to proceed.' });
       return;
     }
 
@@ -357,7 +357,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
         if (regResult.success) {
           setAlert({ 
             type: 'success', 
-            message: `Gmail verified and approved! Welcome to Origins.co, ${regResult.user.name}.` 
+            message: `Gmail verified and approved! Welcome to T2T (Trash to Treasure), ${regResult.user.name}.` 
           });
           setTimeout(() => {
             onLoginSuccess(regResult.user);
@@ -385,7 +385,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
         if (googleResult.success) {
           setAlert({ 
             type: 'success', 
-            message: `Google account approved! Welcome to Origins.co, ${googleResult.user.name}.` 
+            message: `Google account approved! Welcome to T2T (Trash to Treasure), ${googleResult.user.name}.` 
           });
           setTimeout(() => {
             onLoginSuccess(googleResult.user);
@@ -405,12 +405,12 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
           <>
             {/* Header */}
             <div className="auth-header">
-              <div className="auth-logo-badge">O</div>
-              <h2>Origins.co</h2>
+              <div className="auth-logo-badge" style={{ fontSize: '0.85rem', fontWeight: 800 }}>T2T</div>
+              <h2>T2T</h2>
               <p>
                 {activeTab === 'signin' 
-                  ? 'Sign in to reconnect with generational crafts & chronicles'
-                  : 'Create an account to preserve and celebrate authentic craft origins'}
+                  ? 'Sign in to reconnect with upcycled crafts & Trash to Treasure chronicles'
+                  : 'Create an account to celebrate authentic Trash to Treasure upcycling'}
               </p>
             </div>
 
@@ -710,7 +710,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
                     checked={agreeTerms} 
                     onChange={(e) => setAgreeTerms(e.target.checked)} 
                   />
-                  <span>I agree to Origins.co Craft Authenticity & Fair Terms</span>
+                  <span>I agree to T2T (Trash to Treasure) Craft Authenticity & Fair Terms</span>
                 </label>
 
                 {/* Submit Button */}
@@ -736,7 +736,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
             <div className="auth-footer">
               {activeTab === 'signin' ? (
                 <p>
-                  New to Origins.co?{' '}
+                  New to T2T?{' '}
                   <button 
                     type="button" 
                     className="auth-switch-link"
@@ -809,8 +809,8 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
                 <span className="gmail-banner-time">Just now</span>
               </div>
               <div className="gmail-banner-body">
-                <strong>From:</strong> Origins.co Verification &lt;auth@origins.co&gt;<br />
-                <strong>Subject:</strong> Your Origins.co Account Approval OTP
+                <strong>From:</strong> T2T Verification &lt;auth@t2t.eco&gt;<br />
+                <strong>Subject:</strong> Your T2T (Trash to Treasure) Account Approval OTP
               </div>
               <div className="gmail-otp-display-row">
                 <span className="gmail-code-highlight">{activeOtpCode}</span>
@@ -925,7 +925,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
               </svg>
               <h3>Sign in with Google</h3>
-              <p>Enter your real Google / Gmail address to verify and continue to Origins.co</p>
+              <p>Enter your real Google / Gmail address to verify and continue to T2T (Trash to Treasure).</p>
             </div>
 
             <form className="google-modal-form" onSubmit={handleGoogleSubmit}>
@@ -977,7 +977,7 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
             </form>
 
             <div className="google-modal-footer">
-              <p>Origins.co uses Google OAuth standards with Gmail OTP verification to guarantee craft patron integrity.</p>
+              <p>T2T uses Google OAuth standards with Gmail OTP verification to guarantee craft patron integrity.</p>
             </div>
           </div>
         </div>

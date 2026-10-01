@@ -440,10 +440,10 @@ function App() {
       <header className="main-header">
         <div className="container header-inner">
           <div className="logo-section" onClick={() => setView({ name: 'feed', params: null })}>
-            <span className="logo-mark">O</span>
+            <span className="logo-mark" style={{ fontSize: '0.85rem', fontWeight: 800, letterSpacing: '0.5px' }}>T2T</span>
             <div className="logo-text-group">
-              <h1 className="logo-title">Origins.co</h1>
-              <span className="logo-tagline">Know Your Origin</span>
+              <h1 className="logo-title">T2T</h1>
+              <span className="logo-tagline">Trash to Treasure</span>
             </div>
           </div>
           
@@ -764,7 +764,7 @@ function App() {
               <aside className="feed-sidebar">
                 <div className="sidebar-widget welcome-widget">
                   <h3>Our Philosophy</h3>
-                  <p>Every handwoven weave, carved grain of wood, and terracotta kiln-fired pot holds a human history. Origins.co ensures full provenance traceability directly from the creator's hands to yours.</p>
+                  <p>Every reclaimed timber cut, salvaged textile scrap, and riverbed silt holds a renewed life. T2T (Trash to Treasure) ensures full provenance traceability directly from the upcycling creator's hands to yours.</p>
                 </div>
                 
                 <div className="sidebar-widget featured-artisans-widget">
@@ -933,16 +933,16 @@ function App() {
                         <Globe size={18} className="cert-globe" />
                         <h4>Verified Origin Certificate</h4>
                       </div>
-                      <p>Every piece is stamped with a unique physical QR certificate linking to this digital ledger of the artisan's workspace. Certified materials and localized origin verified by Origins.co standards.</p>
+                      <p>Every piece is stamped with a unique physical QR certificate linking to this digital ledger of the artisan's workspace. Certified reclaimed materials and verified upcycling provenance by T2T standards.</p>
                       
                       <div className="simulated-qr-box">
                         <div className="qr-img-mock">
                           {/* Quick visual grid representing QR */}
                           <div className="qr-cube"></div>
-                          <div className="qr-text">ORIGIN VERIFIED</div>
+                          <div className="qr-text">T2T VERIFIED</div>
                         </div>
                         <div className="qr-details">
-                          <span className="cert-num">CERT ID: #OR-{product.id.split('_').pop()}</span>
+                          <span className="cert-num">CERT ID: #T2T-{product.id.split('_').pop()}</span>
                           <span className="cert-status-tag">Status: Active Ledger</span>
                         </div>
                       </div>
@@ -1159,7 +1159,7 @@ function App() {
               <section className="impact-dashboard">
                 <div className="impact-header">
                   <h2>Your Craft Support Map</h2>
-                  <p>Every transaction on Origins.co feeds directly into the preservation of indigenous craft sectors.</p>
+                  <p>Every transaction on T2T (Trash to Treasure) directly prevents waste and feeds into sustaining indigenous upcycling artisans.</p>
                 </div>
                 
                 <div className="impact-stats-grid">
@@ -1807,13 +1807,13 @@ function App() {
       <footer className="main-footer">
         <div className="container footer-inner">
           <div className="footer-copyright">
-            <h4>Origins.co</h4>
-            <p>Every product has an origin. Know yours.</p>
-            <span>&copy; {new Date().getFullYear()} Origins.co. All rights reserved.</span>
+            <h4>T2T</h4>
+            <p>Trash to Treasure — Upcycled with Craft and Purpose.</p>
+            <span>&copy; {new Date().getFullYear()} T2T (Trash to Treasure). All rights reserved.</span>
           </div>
           <div className="footer-links">
-            <a href="#about" onClick={(e) => { e.preventDefault(); alert("Origins.co connects patrons directly with regional artisans, guaranteeing materials and provenance authenticity."); }}>About Project</a>
-            <a href="#standards" onClick={(e) => { e.preventDefault(); alert("Our standards ensure fair compensation, preservation of generational skills, and fully traceable material supplies."); }}>Verification Standards</a>
+            <a href="#about" onClick={(e) => { e.preventDefault(); alert("T2T (Trash to Treasure) connects patrons directly with regional artisans who transform discarded and reclaimed materials into handcrafted treasures with verified provenance."); }}>About T2T</a>
+            <a href="#standards" onClick={(e) => { e.preventDefault(); alert("Our standards ensure fair compensation, authentic material upcycling, zero-waste practices, and fully traceable supply chains."); }}>Verification Standards</a>
           </div>
         </div>
       </footer>

@@ -7,6 +7,18 @@ import {
 } from '../data/mockData';
 
 const KEYS = {
+  ARTISANS: 't2t_artisans',
+  PRODUCTS: 't2t_products',
+  POSTS: 't2t_posts',
+  ORDERS: 't2t_orders',
+  REVIEWS: 't2t_reviews',
+  CURRENT_USER: 't2t_current_user',
+  FOLLOWS: 't2t_follows',
+  CART: 't2t_cart',
+  USERS: 't2t_users'
+};
+
+const LEGACY_KEYS = {
   ARTISANS: 'origins_artisans',
   PRODUCTS: 'origins_products',
   POSTS: 'origins_posts',
@@ -20,6 +32,19 @@ const KEYS = {
 
 // Initialize Storage with mock data if empty
 export const initStorage = () => {
+  // Migrate any previous origins_* keys seamlessly to t2t_*
+  try {
+    Object.keys(KEYS).forEach(k => {
+      const newKey = KEYS[k];
+      const oldKey = LEGACY_KEYS[k];
+      if (!localStorage.getItem(newKey) && localStorage.getItem(oldKey)) {
+        localStorage.setItem(newKey, localStorage.getItem(oldKey));
+      }
+    });
+  } catch (_e) {
+    // Ignore migration errors
+  }
+
   if (!localStorage.getItem(KEYS.ARTISANS)) {
     localStorage.setItem(KEYS.ARTISANS, JSON.stringify(INITIAL_ARTISANS));
   }
@@ -295,15 +320,15 @@ export const storage = {
     // 6-digit cryptographic-style OTP
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = Date.now() + 5 * 60 * 1000; // 5 mins validity
-    const otps = JSON.parse(localStorage.getItem('origins_otps') || '{}');
+    const otps = JSON.parse(localStorage.getItem('t2t_otps') || localStorage.getItem('origins_otps') || '{}');
     otps[cleanEmail] = { code, expiry, createdAt: Date.now() };
-    localStorage.setItem('origins_otps', JSON.stringify(otps));
+    localStorage.setItem('t2t_otps', JSON.stringify(otps));
     return code;
   },
 
   getLatestOtp: (email) => {
     const cleanEmail = (email || '').trim().toLowerCase();
-    const otps = JSON.parse(localStorage.getItem('origins_otps') || '{}');
+    const otps = JSON.parse(localStorage.getItem('t2t_otps') || localStorage.getItem('origins_otps') || '{}');
     const record = otps[cleanEmail];
     if (record && Date.now() <= record.expiry) {
       return record.code;
@@ -313,7 +338,7 @@ export const storage = {
 
   verifyOtp: (email, code) => {
     const cleanEmail = (email || '').trim().toLowerCase();
-    const otps = JSON.parse(localStorage.getItem('origins_otps') || '{}');
+    const otps = JSON.parse(localStorage.getItem('t2t_otps') || localStorage.getItem('origins_otps') || '{}');
     const record = otps[cleanEmail];
     if (!record) {
       return { success: false, error: 'No verification code requested for this Gmail address. Please request a new code.' };
@@ -325,7 +350,7 @@ export const storage = {
       return { success: false, error: 'Invalid 6-digit verification code. Please check your email and try again.' };
     }
     delete otps[cleanEmail];
-    localStorage.setItem('origins_otps', JSON.stringify(otps));
+    localStorage.setItem('t2t_otps', JSON.stringify(otps));
     return { success: true };
   },
 
