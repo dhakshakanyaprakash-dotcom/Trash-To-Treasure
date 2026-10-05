@@ -2771,3 +2771,168 @@
   margin: var(--space-md) 0;
   text-align: center;
 }
+
+/* ==========================================================================
+   MOBILE & LAPTOP RESPONSIVE ADAPTATIONS (T2T Platform)
+   ========================================================================== */
+
+/* Tablet & Mobile Screens (<= 850px) */
+@media (max-width: 850px) {
+  .main-header {
+    padding-top: var(--space-xs);
+    padding-bottom: var(--space-xs);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-inner {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    justify-content: space-between;
+  }
+
+  .logo-section {
+    gap: 0.5rem;
+  }
+
+  .header-logo-image {
+    width: 38px;
+    height: 38px;
+  }
+
+  .logo-title {
+    font-size: 1.15rem;
+  }
+
+  .logo-tagline {
+    font-size: 0.65rem;
+  }
+
+  /* Horizontal Scrollable Navigation Pills on Mobile */
+  .header-nav {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 3px;
+    scrollbar-width: none;
+    gap: 0.35rem;
+    display: flex;
+  }
+
+  .header-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-link {
+    white-space: nowrap;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.84rem;
+    flex-shrink: 0;
+  }
+
+  .role-switch-zone {
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .user-indicator {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .btn-small {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.75rem;
+  }
+
+  /* Product Grid on Tablets / Mobile */
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-md);
+  }
+
+  /* Feed Story Layout */
+  .feed-main-col {
+    gap: var(--space-md);
+  }
+
+  /* Cart & Checkout Stacking */
+  .cart-view-layout {
+    grid-template-columns: 1fr;
+  }
+
+  /* Customer Dashboard */
+  .orders-section-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+  }
+
+  .order-ledger-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+  }
+
+  .order-edit-form-actions {
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .order-edit-form-actions button {
+    width: 100%;
+  }
+}
+
+/* Small Mobile Screens (<= 480px) */
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .category-pill {
+    padding: 0.35rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .main-content {
+    padding: 0.75rem 0;
+  }
+
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .order-photo-edit-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Laptop & Desktop Screens (>= 1024px) */
+@media (min-width: 1024px) {
+  .header-inner {
+    padding: 0.25rem 0;
+  }
+
+  .header-nav {
+    gap: var(--space-sm);
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}

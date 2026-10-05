@@ -424,28 +424,44 @@ export default function SplashScreen({ onComplete }) {
   // Generate responsive waste items with polar coordinates
   const wasteItems = useMemo(() => {
     const isMobile = dimensions.width < 768;
-    const count = isMobile ? SPLASH_CONFIG.mobileItemCount : SPLASH_CONFIG.desktopItemCount;
-    const radiusBase = Math.max(dimensions.width, dimensions.height) * 0.65;
+    const isSmallMobile = dimensions.width < 480;
+    const count = isSmallMobile 
+      ? 12 
+      : isMobile 
+        ? SPLASH_CONFIG.mobileItemCount 
+        : SPLASH_CONFIG.desktopItemCount;
+
+    const radiusBase = Math.max(dimensions.width, dimensions.height) * (isMobile ? 0.72 : 0.65);
+    const maxDriftX = dimensions.width * 0.4;
+    const maxDriftY = dimensions.height * 0.4;
 
     return Array.from({ length: count }).map((_, index) => {
-      const angle = (index / count) * Math.PI * 2 + (Math.random() * 0.3 - 0.15);
-      const initialDist = radiusBase + (Math.random() * 150 - 75);
-      const driftDist = Math.min(dimensions.width, dimensions.height) * 0.32 + (Math.random() * 80 - 40);
+      const angle = (index / count) * Math.PI * 2 + (Math.random() * 0.25 - 0.12);
+      const initialDist = radiusBase + (Math.random() * 120 - 60);
 
       // Start position outside screen bounds
       const startX = Math.cos(angle) * initialDist;
       const startY = Math.sin(angle) * initialDist;
 
-      // Intermediate drift position in view
-      const driftX = Math.cos(angle) * driftDist;
-      const driftY = Math.sin(angle) * driftDist;
+      // Intermediate drift position in view (clamped for portrait phone viewports)
+      const driftRadius = Math.min(dimensions.width, dimensions.height) * (isMobile ? 0.36 : 0.34) + (Math.random() * 50 - 25);
+      let driftX = Math.cos(angle) * driftRadius;
+      let driftY = Math.sin(angle) * driftRadius;
+
+      if (isMobile) {
+        driftX = Math.max(-maxDriftX, Math.min(maxDriftX, driftX));
+        driftY = Math.max(-maxDriftY, Math.min(maxDriftY, driftY));
+      }
 
       const Component = WASTE_COMPONENTS[index % WASTE_COMPONENTS.length];
       const color = ITEM_COLORS[index % ITEM_COLORS.length];
       const stitch = index % 2 === 0 ? SPLASH_CONFIG.colors.cream : SPLASH_CONFIG.colors.charcoal;
       const initRot = (Math.random() * 360) - 180;
       const spinAmount = (Math.random() > 0.5 ? 1 : -1) * (360 + Math.random() * 360);
-      const scale = 0.8 + Math.random() * 0.4;
+
+      // Dynamic scale for device size
+      const baseScale = isSmallMobile ? 0.58 : isMobile ? 0.7 : 0.95;
+      const scale = baseScale + Math.random() * (isMobile ? 0.18 : 0.28);
 
       return {
         id: index,
@@ -465,25 +481,32 @@ export default function SplashScreen({ onComplete }) {
 
   // Sparkle burst particles
   const sparkles = useMemo(() => {
-    return Array.from({ length: 14 }).map((_, i) => {
-      const angle = (i / 14) * Math.PI * 2;
-      const distance = 90 + Math.random() * 80;
+    const isMobile = dimensions.width < 768;
+    const count = isMobile ? 10 : 16;
+    return Array.from({ length: count }).map((_, i) => {
+      const angle = (i / count) * Math.PI * 2;
+      const distance = (isMobile ? 65 : 95) + Math.random() * (isMobile ? 50 : 80);
       return {
         id: i,
         targetX: Math.cos(angle) * distance,
         targetY: Math.sin(angle) * distance,
-        size: 8 + Math.random() * 8,
+        size: (isMobile ? 6 : 8) + Math.random() * (isMobile ? 6 : 8),
         color: i % 2 === 0 ? SPLASH_CONFIG.colors.gold : SPLASH_CONFIG.colors.mustard,
         delay: (i % 3) * 0.04,
       };
     });
-  }, []);
+  }, [dimensions.width]);
 
   return (
     <div 
       className={`splash-fullscreen-container ${phase === 'reveal' ? 'phase-reveal' : ''}`}
       role="status"
       aria-label="Trash to Treasure Introduction"
+      onClick={(e) => {
+        // Tap anywhere on screen to skip (especially friendly on touchscreens)
+        if (e.target.closest('.splash-control-btn')) return;
+        handleSkip();
+      }}
     >
       <div className="sr-only">
         Trash to Treasure is opening. Transforming reclaimed materials into handcrafted treasures.
