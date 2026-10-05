@@ -1,6 +1,6 @@
 <div align="center">
 
-# ♻️ T2T — Trash to Treasure
+# ♻️ T2T - Trash to Treasure
 
 ### Turning Waste into Creativity
 
@@ -20,70 +20,53 @@
 
 ---
 
-## 📖 Table of Contents
 
-- [About the Project](#-about-the-project)
-- [The Problem](#-the-problem)
-- [Our Solution](#-our-solution)
-- [Key Features](#-key-features)
-- [User Roles](#-user-roles)
-- [Tech Stack](#-tech-stack)
-- [System Architecture](#-system-architecture)
-- [Getting Started](#-getting-started)
-- [Environment Variables](#-environment-variables)
-- [Project Structure](#-project-structure)
-- [API Overview](#-api-overview)
-- [Roadmap](#-roadmap)
-- [Impact](#-impact)
-- [Contributing](#-contributing)
-- [Author](#-author)
-- [License](#-license)
 
 ---
 
-## 🌱 About the Project
+##  About the Project
 
 **Trash to Treasure (T2T)** is an upcycling social-commerce platform that connects creators, learners and conscious buyers. Creators publish what they made from waste, learners discover and recreate those ideas at home, and buyers support local makers directly.
 
 > **Simple concept:** Waste Material → New Creation → Shared Journey.
 > *Giving waste a second life.*
 
-## ❗ The Problem
+## The Problem
 
 | Problem | What it means |
 |---|---|
 | ♻️ **Reusable materials are discarded** | Valuable resources are thrown away daily. Tamil Nadu alone generates 17,843+ (per day) of waste. |
-| 🎨 **Creative reuse is under-used** | Upcycling ideas exist but are scattered and not widely practised in communities. |
-| 🔍 **Creators lack visibility** | Local talent has no dedicated platform to showcase and sell their work. |
+|  **Creative reuse is under-used** | Upcycling ideas exist but are scattered and not widely practised in communities. |
+|  **Creators lack visibility** | Local talent has no dedicated platform to showcase and sell their work. |
 
 **The question:** *Can waste become something valuable?*
 
-## 💡 Our Solution
+##  Our Solution
 
 T2T gives every creation a structured story:
 
 | Step | Question it answers |
 |---|---|
-| 🧴 **Material** | What waste was used? |
-| 💡 **Idea** | What inspired the creation? |
-| 🛠️ **Process** | How was it made? |
-| ✨ **Result** | What did it become? |
+|  **Material** | What waste was used? |
+|  **Idea** | What inspired the creation? |
+|  **Process** | How was it made? |
+|  **Result** | What did it become? |
 
 *Example: Plastic Bottle → DIY Process → Decorative Lamp*
 
 The platform is built around five actions: **Reuse · Create · Share · Inspire · Sell**.
 
-## ✨ Key Features
+##  Key Features
 
-- 🔍 **Explore** creations from makers around you, with search and filters by material and category
-- 📖 **Learn** the journey behind each piece through the Material, Idea, Process, Result story
-- 🛠️ **Try** your own version at home using step-by-step guides
-- 🛒 **Buy** products and support the creator directly
-- ❤️ **Connect** with likes, comments and follows
-- 🎨 **Creator dashboard** to publish projects, manage products and receive orders
-- 🔐 **Admin panel** to moderate users, content and products and to view reports
-- 🔑 Secure authentication with JWT and role-based access control
-- 📱 Responsive design for mobile, tablet and desktop
+-  **Explore** creations from makers around you, with search and filters by material and category
+-  **Learn** the journey behind each piece through the Material, Idea, Process, Result story
+-  **Try** your own version at home using step-by-step guides
+-  **Buy** products and support the creator directly
+-  **Connect** with likes, comments and follows
+-  **Creator dashboard** to publish projects, manage products and receive orders
+-  **Admin panel** to moderate users, content and products and to view reports
+-  Secure authentication with JWT and role-based access control
+-  Responsive design for mobile, tablet and desktop
 
 **User journey:** `Explore → Learn → Try → Buy`
 
@@ -91,11 +74,11 @@ The platform is built around five actions: **Reuse · Create · Share · Inspire
 
 | Role | Capabilities |
 |---|---|
-| 👤 **User** | Explore, learn, like / comment, follow creators, buy products |
-| 🎨 **Creator** | Create projects, share the journey, manage products, receive orders |
-| 🔐 **Admin** | Manage users, content, products and reports |
+|  **User** | Explore, learn, like / comment, follow creators, buy products |
+|  **Creator** | Create projects, share the journey, manage products, receive orders |
+|  **Admin** | Manage users, content, products and reports |
 
-## 🧰 Tech Stack
+##  Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -128,7 +111,7 @@ The platform is built around five actions: **Reuse · Create · Share · Inspire
 └───────────────────┘  └──────────────────┘
 ```
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -232,23 +215,23 @@ trash-to-treasure/
 - [x] Project stories (Material, Idea, Process, Result)
 - [x] Product listing and ordering
 - [x] Likes, comments and follows
-- [ ] 🤖 **AI-Powered Waste Scanner**: a smart craft recommender based on the type of waste in a photo
-- [ ] 🏆 **Gamification & Eco-Impact Points**: reward sustainable creativity
-- [ ] 💳 Online payment gateway (UPI / cards)
-- [ ] 📦 Delivery partner integration
-- [ ] 🌐 Multilingual support (including Tamil)
-- [ ] 📱 Native mobile app
+- [ ]  **AI-Powered Waste Scanner**: a smart craft recommender based on the type of waste in a photo
+- [ ]  **Gamification & Eco-Impact Points**: reward sustainable creativity
+- [ ]  Online payment gateway (UPI / cards)
+- [ ]  Delivery partner integration
+- [ ]  Multilingual support (including Tamil)
+- [ ]  Native mobile app
 
-## 🌍 Impact
+##  Impact
 
 | Dimension | Outcome |
 |---|---|
-| ♻️ **Environmental** | More reuse, less waste |
-| 🎨 **Creative** | More ideas, more skills |
-| 👥 **Social** | Creators, learners and community |
-| 💰 **Economic** | Create, showcase and sell |
+|  **Environmental** | More reuse, less waste |
+|  **Creative** | More ideas, more skills |
+|  **Social** | Creators, learners and community |
+|  **Economic** | Create, showcase and sell |
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions, issues and feature requests are welcome.
 
