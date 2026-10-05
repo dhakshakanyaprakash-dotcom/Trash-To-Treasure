@@ -20,7 +20,13 @@ import {
   Globe, 
   LogIn, 
   LogOut, 
-  UserPlus
+  UserPlus,
+  Camera,
+  Edit3,
+  Upload,
+  X,
+  Check,
+  Sparkles
 } from 'lucide-react';
 import './App.css';
 import AuthView from './components/AuthView';
@@ -57,6 +63,16 @@ function App() {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewText, setReviewText] = useState('');
   const [reviewImage, setReviewImage] = useState('');
+  
+  // Order Customization & Photo Editing States
+  const [editingOrderId, setEditingOrderId] = useState(null);
+  const [editOrderDescription, setEditOrderDescription] = useState('');
+  const [editOrderImage, setEditOrderImage] = useState('');
+  const [orderToastMessage, setOrderToastMessage] = useState(null);
+
+  // Checkout Customization States
+  const [checkoutNotes, setCheckoutNotes] = useState('');
+  const [checkoutImage, setCheckoutImage] = useState('');
   
   // Artisan Form States
   const [newProduct, setNewProduct] = useState({
@@ -237,7 +253,8 @@ function App() {
         productId: item.id,
         quantity: item.quantity,
         price: item.price,
-        customizationNotes: item.customizationNotes || 'Standard order.',
+        customizationNotes: checkoutNotes.trim() || item.customizationNotes || 'Standard order.',
+        customizationImage: checkoutImage.trim() || null,
         status: 'placed', // placed, confirmed, shipped, delivered, cancelled
         shippingAddress: defaultAddress,
         paymentStatus: 'paid',
@@ -255,11 +272,75 @@ function App() {
       }
     });
 
-    // Clear cart
+    // Clear cart and checkout customization inputs
     storage.setCart([]);
     setCart([]);
+    setCheckoutNotes('');
+    setCheckoutImage('');
     setView({ name: 'customer-dashboard', params: null });
     loadState();
+  };
+
+  // Order Editing Handlers (Customer Updating Order Notes & Photo)
+  const startEditingOrder = (order) => {
+    setEditingOrderId(order.id);
+    setEditOrderDescription(order.customizationNotes || '');
+    setEditOrderImage(order.customizationImage || '');
+    setReviewFormOrderId(null);
+  };
+
+  const cancelEditingOrder = () => {
+    setEditingOrderId(null);
+    setEditOrderDescription('');
+    setEditOrderImage('');
+  };
+
+  const handleOrderImageFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Photo is larger than 5MB. Please choose a smaller file.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setEditOrderImage(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCheckoutImageFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Photo is larger than 5MB. Please choose a smaller file.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCheckoutImage(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveOrderUpdate = (e, orderId) => {
+    e.preventDefault();
+    const orderToUpdate = orders.find(o => o.id === orderId);
+    if (!orderToUpdate) return;
+
+    const updated = {
+      ...orderToUpdate,
+      customizationNotes: editOrderDescription.trim() || 'Standard order.',
+      customizationImage: editOrderImage.trim() || null,
+      updatedAt: new Date().toISOString()
+    };
+    storage.saveOrder(updated);
+    setOrders(storage.getOrders());
+    setEditingOrderId(null);
+    setOrderToastMessage(`Order #${orderToUpdate.id.split('_')[1]} updated with new customization notes and photo!`);
+    setTimeout(() => {
+      setOrderToastMessage(null);
+    }, 4500);
   };
 
   // Review Submit
@@ -1123,6 +1204,77 @@ function App() {
                         </div>
                       )}
 
+                      {/* TRASH TO TREASURE (T2T) CUSTOMIZATION & PHOTO ATTACHMENT */}
+                      <div className="checkout-custom-card">
+                        <div className="checkout-custom-header">
+                          <Sparkles size={16} className="sparkle-icon" />
+                          <h4>Trash to Treasure (T2T) Scrap Notes & Photo (Optional)</h4>
+                        </div>
+                        <p className="checkout-custom-desc">
+                          Have raw scrap materials (textile scraps, reclaimed timber, broken pottery) or a custom upcycling vision? Add notes and attach a photo for the maker.
+                        </p>
+
+                        <div className="form-group">
+                          <label htmlFor="checkout-notes">Customization Description / Scrap Notes</label>
+                          <textarea
+                            id="checkout-notes"
+                            rows="2"
+                            placeholder="e.g., I will send 2 pairs of vintage denim for upcycling; please use the contrast back pockets for the outer pouch..."
+                            value={checkoutNotes}
+                            onChange={(e) => setCheckoutNotes(e.target.value)}
+                          ></textarea>
+                        </div>
+
+                        <div className="form-group">
+                          <label>Attach Scrap Material or Reference Photo</label>
+                          <div className="order-photo-uploader-box">
+                            <div className="order-photo-upload-actions">
+                              <label className="btn btn-secondary btn-small file-input-label">
+                                <Upload size={14} />
+                                <span>Upload Photo from Device</span>
+                                <input 
+                                  type="file" 
+                                  accept="image/*" 
+                                  onChange={handleCheckoutImageFileUpload} 
+                                  style={{ display: 'none' }}
+                                />
+                              </label>
+                              <span className="uploader-or-separator">or paste image URL</span>
+                            </div>
+
+                            <input 
+                              type="url"
+                              placeholder="https://... or upload photo above"
+                              value={checkoutImage}
+                              onChange={(e) => setCheckoutImage(e.target.value)}
+                              className="order-photo-url-input"
+                            />
+
+                            {checkoutImage && (
+                              <div className="order-photo-preview-card">
+                                <img 
+                                  src={checkoutImage} 
+                                  alt="Checkout scrap material preview" 
+                                  className="order-photo-preview-img" 
+                                  onError={handleImageError} 
+                                />
+                                <div className="order-photo-preview-info">
+                                  <span className="preview-label"><Check size={13} /> Photo attached to order</span>
+                                  <button 
+                                    type="button" 
+                                    className="btn-text btn-small remove-photo-btn"
+                                    onClick={() => setCheckoutImage('')}
+                                  >
+                                    <X size={13} />
+                                    <span>Remove</span>
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
                       <div className="payment-simulation-notice">
                         <p>Simulating Razorpay/Stripe checkout. No actual money will be charged.</p>
                       </div>
@@ -1180,7 +1332,18 @@ function App() {
 
               {/* ORDERS LIST */}
               <section className="customer-orders-section">
-                <h3>Your Ordered Provenance Logs</h3>
+                <div className="orders-section-header-row">
+                  <h3>Your Ordered Provenance Logs</h3>
+                  <span className="orders-section-sub">Customize your orders with scrap material notes and photos for the artisan</span>
+                </div>
+
+                {orderToastMessage && (
+                  <div className="order-update-toast fade-in">
+                    <CheckCircle size={16} />
+                    <span>{orderToastMessage}</span>
+                  </div>
+                )}
+
                 {customerOrders.length === 0 ? (
                   <p className="no-orders-p">No orders placed yet. Start supporting artisans in the market!</p>
                 ) : (
@@ -1221,6 +1384,15 @@ function App() {
                               {order.isReviewed && (
                                 <span className="reviewed-badge-indicator">Appraisal Submitted</span>
                               )}
+
+                              <button 
+                                className="btn btn-secondary btn-small"
+                                onClick={() => startEditingOrder(order)}
+                                title="Update order notes and attach photo of your scrap material"
+                              >
+                                <Edit3 size={13} />
+                                <span>{order.customizationImage || (order.customizationNotes && order.customizationNotes !== 'Standard order.') ? 'Update Photo & Notes' : 'Add Photo & Notes'}</span>
+                              </button>
                               
                               <button 
                                 className="btn btn-text btn-small"
@@ -1230,6 +1402,131 @@ function App() {
                               </button>
                             </div>
                           </div>
+
+                          {/* CUSTOM SPEC & ATTACHED SCRAP PHOTO DISPLAY */}
+                          {(order.customizationNotes || order.customizationImage) && (
+                            <div className="order-customization-preview">
+                              <div className="order-custom-spec-head">
+                                <Sparkles size={13} className="sparkle-icon" />
+                                <strong>Custom Scrap Material & Instructions:</strong>
+                              </div>
+                              {order.customizationNotes && (
+                                <p className="order-custom-notes-text">"{order.customizationNotes}"</p>
+                              )}
+                              {order.customizationImage && (
+                                <div className="order-custom-photo-row">
+                                  <div className="order-custom-photo-box">
+                                    <img 
+                                      src={order.customizationImage} 
+                                      alt="Customer attached scrap material" 
+                                      className="order-custom-pic" 
+                                      onError={handleImageError} 
+                                    />
+                                  </div>
+                                  <div className="order-custom-pic-caption">
+                                    <Camera size={13} />
+                                    <span>Attached Scrap / Inspiration Photo</span>
+                                    <a 
+                                      href={order.customizationImage} 
+                                      target="_blank" 
+                                      rel="noreferrer" 
+                                      className="view-full-pic-link"
+                                    >
+                                      View Full Photo
+                                    </a>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* INLINE EDIT ORDER FORM */}
+                          {editingOrderId === order.id && (
+                            <form onSubmit={(e) => handleSaveOrderUpdate(e, order.id)} className="order-edit-dropdown-form fade-in">
+                              <div className="order-edit-form-header">
+                                <div className="order-edit-title-group">
+                                  <Edit3 size={16} />
+                                  <h4>Update Order #{order.id.split('_')[1]} — Notes & Material Photo</h4>
+                                </div>
+                                <span className="order-edit-hint">Describe your raw trash/scraps or attach reference photos for the artisan</span>
+                              </div>
+
+                              <div className="form-group">
+                                <label htmlFor={`order-notes-${order.id}`}>Customization Description & Scrap Notes</label>
+                                <textarea
+                                  id={`order-notes-${order.id}`}
+                                  rows="3"
+                                  placeholder="Describe how you'd like your piece made, dimensions, scrap material condition, or specific artisan instructions..."
+                                  value={editOrderDescription}
+                                  onChange={(e) => setEditOrderDescription(e.target.value)}
+                                  required
+                                ></textarea>
+                              </div>
+
+                              <div className="form-group">
+                                <label>Attached Photo (Scrap Material / Design Reference)</label>
+                                <div className="order-photo-uploader-box">
+                                  <div className="order-photo-upload-actions">
+                                    <label className="btn btn-secondary btn-small file-input-label">
+                                      <Upload size={14} />
+                                      <span>Upload Photo from Device</span>
+                                      <input 
+                                        type="file" 
+                                        accept="image/*" 
+                                        onChange={handleOrderImageFileUpload} 
+                                        style={{ display: 'none' }}
+                                      />
+                                    </label>
+                                    <span className="uploader-or-separator">or paste web URL below</span>
+                                  </div>
+
+                                  <input 
+                                    type="url"
+                                    placeholder="https://... or upload photo above"
+                                    value={editOrderImage}
+                                    onChange={(e) => setEditOrderImage(e.target.value)}
+                                    className="order-photo-url-input"
+                                  />
+
+                                  {editOrderImage && (
+                                    <div className="order-photo-preview-card">
+                                      <img 
+                                        src={editOrderImage} 
+                                        alt="Photo attachment preview" 
+                                        className="order-photo-preview-img" 
+                                        onError={handleImageError} 
+                                      />
+                                      <div className="order-photo-preview-info">
+                                        <span className="preview-label"><Check size={13} /> Photo ready to attach</span>
+                                        <button 
+                                          type="button" 
+                                          className="btn-text btn-small remove-photo-btn"
+                                          onClick={() => setEditOrderImage('')}
+                                        >
+                                          <X size={13} />
+                                          <span>Remove</span>
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="form-actions-row">
+                                <button type="submit" className="btn btn-primary btn-small">
+                                  <Check size={14} />
+                                  <span>Save Order Updates</span>
+                                </button>
+                                <button 
+                                  type="button" 
+                                  className="btn btn-secondary btn-small" 
+                                  onClick={cancelEditingOrder}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </form>
+                          )}
 
                           {/* Appraise Form Toggle */}
                           {reviewFormOrderId === order.id && (
@@ -1348,11 +1645,37 @@ function App() {
                                 <span className={`status-badge-val ${order.status}`}>{order.status}</span>
                               </div>
                               <div className="order-details-body">
-                                <p>Product: {orderProd?.title}</p>
-                                <p>Quantity: {order.quantity} | Total: ₹{order.price * order.quantity}</p>
-                                <p>Notes: {order.customizationNotes}</p>
+                                <p><strong>Product:</strong> {orderProd?.title}</p>
+                                <p><strong>Quantity:</strong> {order.quantity} | <strong>Total:</strong> ₹{order.price * order.quantity}</p>
+                                {order.customizationNotes && (
+                                  <div className="artisan-order-spec-block">
+                                    <strong>Customer Scrap Notes:</strong>
+                                    <p className="artisan-spec-notes">"{order.customizationNotes}"</p>
+                                  </div>
+                                )}
+                                {order.customizationImage && (
+                                  <div className="artisan-order-photo-block">
+                                    <strong>Customer Attached Material Photo:</strong>
+                                    <div className="artisan-order-photo-wrap">
+                                      <img 
+                                        src={order.customizationImage} 
+                                        alt="Customer scrap material photo" 
+                                        className="artisan-order-pic"
+                                        onError={handleImageError} 
+                                      />
+                                      <a 
+                                        href={order.customizationImage} 
+                                        target="_blank" 
+                                        rel="noreferrer" 
+                                        className="artisan-view-photo-link"
+                                      >
+                                        <Camera size={12} /> View Full Photo
+                                      </a>
+                                    </div>
+                                  </div>
+                                )}
                                 <p className="cust-shipping-txt">
-                                  Ship To: {order.shippingAddress?.name}, {order.shippingAddress?.street}, {order.shippingAddress?.city}
+                                  <strong>Ship To:</strong> {order.shippingAddress?.name}, {order.shippingAddress?.street}, {order.shippingAddress?.city}
                                 </p>
                               </div>
                               <div className="order-status-actions">

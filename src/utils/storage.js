@@ -139,6 +139,11 @@ export const initStorage = () => {
         so.shippingAddress.name = 'Aarav Sharma';
         ordersChanged = true;
       }
+      const initialOrder = INITIAL_ORDERS.find(io => io.id === so.id);
+      if (initialOrder && initialOrder.customizationImage && !so.customizationImage) {
+        so.customizationImage = initialOrder.customizationImage;
+        ordersChanged = true;
+      }
     });
     if (ordersChanged) {
       localStorage.setItem(KEYS.ORDERS, JSON.stringify(storedOrders));

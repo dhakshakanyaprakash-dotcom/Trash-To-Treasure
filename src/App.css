@@ -1768,6 +1768,295 @@
   margin-top: var(--space-xs);
 }
 
+/* Order Header Row in Customer Dashboard */
+.orders-section-header-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: var(--space-md);
+  text-align: left;
+}
+
+.orders-section-sub {
+  font-size: 0.85rem;
+  color: var(--color-charcoal-muted);
+}
+
+/* Toast Message */
+.order-update-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0.75rem 1rem;
+  background-color: var(--color-sage-light);
+  color: var(--color-sage);
+  border: 1px solid var(--color-sage);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--space-md);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+/* Custom Scrap & Material Spec Display in Order Card */
+.order-customization-preview {
+  border-top: 1px dashed var(--color-border-light);
+  background-color: #faf7f2;
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  text-align: left;
+}
+
+.order-custom-spec-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--color-terracotta);
+}
+
+.sparkle-icon {
+  color: var(--color-terracotta);
+}
+
+.order-custom-notes-text {
+  font-size: 0.85rem;
+  color: var(--color-charcoal);
+  font-style: italic;
+  margin: 0;
+  line-height: 1.4;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 0.4rem 0.65rem;
+  border-radius: var(--border-radius-sm);
+  border-left: 3px solid var(--color-terracotta);
+}
+
+.order-custom-photo-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: 0.25rem;
+}
+
+.order-custom-photo-box {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--color-border-light);
+  background-color: var(--color-sand);
+  flex-shrink: 0;
+}
+
+.order-custom-pic {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.order-custom-pic-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 0.78rem;
+  color: var(--color-charcoal-muted);
+}
+
+.view-full-pic-link {
+  color: var(--color-terracotta);
+  text-decoration: underline;
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+/* Inline Edit Order Form */
+.order-edit-dropdown-form {
+  border-top: 2px solid var(--color-terracotta);
+  padding: var(--space-md);
+  background-color: #fbf9f5;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  text-align: left;
+}
+
+.order-edit-form-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: var(--space-xs);
+}
+
+.order-edit-title-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-clay);
+}
+
+.order-edit-title-group h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-clay);
+}
+
+.order-edit-hint {
+  font-size: 0.8rem;
+  color: var(--color-charcoal-muted);
+}
+
+/* Order Photo Uploader Box */
+.order-photo-uploader-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.order-photo-upload-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.file-input-label {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.uploader-or-separator {
+  font-size: 0.78rem;
+  color: var(--color-charcoal-muted);
+}
+
+.order-photo-url-input {
+  width: 100%;
+  font-size: 0.85rem;
+}
+
+.order-photo-preview-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background-color: var(--color-sand);
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border-light);
+  margin-top: 0.25rem;
+}
+
+.order-photo-preview-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  object-fit: cover;
+  border: 1px solid var(--color-border-light);
+}
+
+.order-photo-preview-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+}
+
+.preview-label {
+  font-size: 0.8rem;
+  color: var(--color-sage);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.remove-photo-btn {
+  color: #c0392b;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Checkout Custom Card */
+.checkout-custom-card {
+  background-color: #fcfbf8;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--border-radius-md);
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  text-align: left;
+}
+
+.checkout-custom-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-clay);
+}
+
+.checkout-custom-header h4 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.checkout-custom-desc {
+  font-size: 0.8rem;
+  color: var(--color-charcoal-muted);
+  margin: 0;
+  line-height: 1.35;
+}
+
+/* Artisan Studio Order Specs & Photo */
+.artisan-order-spec-block {
+  margin-top: 0.35rem;
+  padding: 0.35rem 0.5rem;
+  background-color: var(--color-sand);
+  border-radius: var(--border-radius-sm);
+  border-left: 3px solid var(--color-terracotta);
+}
+
+.artisan-spec-notes {
+  margin: 2px 0 0 0;
+  font-style: italic;
+  color: var(--color-charcoal);
+}
+
+.artisan-order-photo-block {
+  margin-top: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.artisan-order-photo-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.artisan-order-pic {
+  width: 56px;
+  height: 56px;
+  border-radius: 4px;
+  object-fit: cover;
+  border: 1px solid var(--color-border-light);
+}
+
+.artisan-view-photo-link {
+  font-size: 0.78rem;
+  color: var(--color-terracotta);
+  text-decoration: underline;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 /* --- ARTISAN STUDIO STYLES --- */
 .artisan-dashboard-layout {
   display: flex;

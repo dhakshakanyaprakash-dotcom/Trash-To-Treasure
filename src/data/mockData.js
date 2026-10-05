@@ -214,7 +214,8 @@ export const INITIAL_ORDERS = [
     productId: "prod_4",
     quantity: 1,
     price: 3100,
-    customizationNotes: "Please select a tray piece with heavy grain patterns.",
+    customizationNotes: "Please select a tray piece with heavy grain patterns from reclaimed rosewood.",
+    customizationImage: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&h=450&fit=crop&q=80",
     status: "placed",
     shippingAddress: {
       name: "Aarav Sharma",
