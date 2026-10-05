@@ -1,126 +1,279 @@
-# T2T — Trash to Treasure 🌿✨
-### *Upcycled Handcrafted Living*
+<div align="center">
 
-[![Vercel Deployment](https://img.shields.io/badge/Vercel-Live-success?logo=vercel&style=flat-square)](https://trash-to-treasure.vercel.app)
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-blue?logo=github&style=flat-square)](https://madhu2007-offical.github.io/Trash-To-Treasure/)
-[![React](https://img.shields.io/badge/React-19.2-61dafb?logo=react&style=flat-square)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-8.2-646cff?logo=vite&style=flat-square)](https://vitejs.dev/)
+# ♻️ T2T — Trash to Treasure
 
-An upcycling social-commerce platform connecting conscious patrons directly with regional artisans who transform reclaimed scrap materials into durable handcrafted treasures with verified provenance.
+### Turning Waste into Creativity
+
+**A web-based upcycling platform where reclaimed materials become handcrafted treasures, and every creation comes with its story.**
+
+[![Live Demo](https://img.shields.io/badge/Live-Demo-2F5D3A?style=for-the-badge)](https://trash-to-treasure.vercel.app/)
+![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+
+*Transform Waste. Create Treasure.*
+
+[Live Demo](https://trash-to-treasure.vercel.app/) · [Report a Bug](../../issues) · [Request a Feature](../../issues)
+
+</div>
 
 ---
 
-## 🌐 Live Deployments
+## 📖 Table of Contents
 
-| Platform | URL | Status |
-| :--- | :--- | :---: |
-| **Vercel (Primary)** | [https://trash-to-treasure.vercel.app](https://trash-to-treasure.vercel.app) | 🟢 Active |
-| **Vercel (Secondary)** | [https://t2t-trash-to-treasure.vercel.app](https://t2t-trash-to-treasure.vercel.app) | 🟢 Active |
-| **GitHub Pages** | [https://madhu2007-offical.github.io/Trash-To-Treasure/](https://madhu2007-offical.github.io/Trash-To-Treasure/) | 🟢 Active |
+- [About the Project](#-about-the-project)
+- [The Problem](#-the-problem)
+- [Our Solution](#-our-solution)
+- [Key Features](#-key-features)
+- [User Roles](#-user-roles)
+- [Tech Stack](#-tech-stack)
+- [System Architecture](#-system-architecture)
+- [Getting Started](#-getting-started)
+- [Environment Variables](#-environment-variables)
+- [Project Structure](#-project-structure)
+- [API Overview](#-api-overview)
+- [Roadmap](#-roadmap)
+- [Impact](#-impact)
+- [Contributing](#-contributing)
+- [Author](#-author)
+- [License](#-license)
 
 ---
+
+## 🌱 About the Project
+
+**Trash to Treasure (T2T)** is an upcycling social-commerce platform that connects creators, learners and conscious buyers. Creators publish what they made from waste, learners discover and recreate those ideas at home, and buyers support local makers directly.
+
+> **Simple concept:** Waste Material → New Creation → Shared Journey.
+> *Giving waste a second life.*
+
+## ❗ The Problem
+
+| Problem | What it means |
+|---|---|
+| ♻️ **Reusable materials are discarded** | Valuable resources are thrown away daily. Tamil Nadu alone generates 17,843+ (per day) of waste. |
+| 🎨 **Creative reuse is under-used** | Upcycling ideas exist but are scattered and not widely practised in communities. |
+| 🔍 **Creators lack visibility** | Local talent has no dedicated platform to showcase and sell their work. |
+
+**The question:** *Can waste become something valuable?*
+
+## 💡 Our Solution
+
+T2T gives every creation a structured story:
+
+| Step | Question it answers |
+|---|---|
+| 🧴 **Material** | What waste was used? |
+| 💡 **Idea** | What inspired the creation? |
+| 🛠️ **Process** | How was it made? |
+| ✨ **Result** | What did it become? |
+
+*Example: Plastic Bottle → DIY Process → Decorative Lamp*
+
+The platform is built around five actions: **Reuse · Create · Share · Inspire · Sell**.
 
 ## ✨ Key Features
 
-### 🎬 Cinematic Opening Splash Animation
-- **Drift (0.0s–0.8s):** 26 felt cut-out waste items (plastic bottles, tin cans, cardboard scraps, textiles, tires, glass jars, etc.) with tactile dashed stitching drift onto the screen.
-- **Vortex Swirl (0.8s–2.0s):** Items spiral inward in a swirling vortex toward the center, accompanied by a soft Web Audio synthesizer whoosh.
-- **Treasure Merge (2.0s–2.6s):** Waste merges into the glowing central **T2T Treasure Emblem** (recycling arrows forming a leaf/heart), triggering a golden sparkle burst and harmonic chime chord.
-- **Brand Reveal (2.6s–3.3s):** Wordmark *"Trash to Treasure"* and tagline *"Upcycled Handcrafted Living"* fade up.
-- **Curtain Door Reveal (3.3s–4.0s):** The screen parts open like double doors, seamlessly uncovering the preloaded application without layout shift.
-- **Responsive & Accessible:** Tap-anywhere to skip on mobile, keyboard shortcuts (<kbd>Esc</kbd>, <kbd>Space</kbd>, <kbd>Enter</kbd>), `prefers-reduced-motion` compliance, and safe-area inset support (`env(safe-area-inset-*)`).
+- 🔍 **Explore** creations from makers around you, with search and filters by material and category
+- 📖 **Learn** the journey behind each piece through the Material, Idea, Process, Result story
+- 🛠️ **Try** your own version at home using step-by-step guides
+- 🛒 **Buy** products and support the creator directly
+- ❤️ **Connect** with likes, comments and follows
+- 🎨 **Creator dashboard** to publish projects, manage products and receive orders
+- 🔐 **Admin panel** to moderate users, content and products and to view reports
+- 🔑 Secure authentication with JWT and role-based access control
+- 📱 Responsive design for mobile, tablet and desktop
 
-### 🛍️ Handcrafted Marketplace & Verified Origin QR Certificates
-- Discover curated upcycled pieces categorized by craft (Textiles, Woodcraft, Pottery, Metalwork, Paper & Glass).
-- Each product is stamped with a unique **Verified Origin QR Certificate ID** certifying raw scrap origins and regional artisan provenance.
+**User journey:** `Explore → Learn → Try → Buy`
 
-### 📸 Customer Order Customization & Scrap Photo Upload
-- **Material Customization at Checkout:** Patrons can describe their preferred scrap material specifications and attach scrap photos directly at checkout.
-- **Order Ledger Editor in Dashboard:** Customers can update order notes and upload material photos anytime using device file selection or direct image URLs with instant previews.
+## 👥 User Roles
 
-### 🛠️ Artisan Studio & Customer Dashboard
-- **Artisan Inbox:** Artisans review customer specifications and inspect high-resolution scrap material photos directly in incoming orders.
-- **Patron Dashboard:** Track active orders, provenance milestones, and environmental impact metrics.
+| Role | Capabilities |
+|---|---|
+| 👤 **User** | Explore, learn, like / comment, follow creators, buy products |
+| 🎨 **Creator** | Create projects, share the journey, manage products, receive orders |
+| 🔐 **Admin** | Manage users, content, products and reports |
 
-### 🔐 Authentication & Verification
-- Real account sign-in and sign-up with email, phone number, and password.
-- Real Gmail OTP verification flow with one-click code auto-fill.
-- One-click Google sign-in modal with instant account provisioning.
+## 🧰 Tech Stack
 
----
+| Layer | Technology |
+|---|---|
+| **Frontend** | HTML, CSS, JavaScript, React |
+| **Backend** | Node.js, Express |
+| **Database** | MongoDB (Mongoose) / MySQL |
+| **Auth & Security** | JWT, bcrypt, express-validator, CORS |
+| **File Uploads** | Multer |
+| **Deployment** | Vercel (frontend) |
 
-## 💻 Tech Stack
+## 🏗️ System Architecture
 
-- **Frontend:** React 19, JavaScript (ES Module)
-- **Tooling & Build:** Vite 8, Oxlint
-- **Motion & Animations:** Framer Motion 14, Hardware-Accelerated CSS
-- **Audio:** Web Audio API (Synthesized chime and wind whoosh; zero external audio files)
-- **Icons:** Lucide React
-- **Hosting:** Vercel & GitHub Pages
-
----
+```
+┌──────────────────────────────────────────┐
+│  Browser  (Desktop / Tablet / Mobile)    │
+└───────────────────┬──────────────────────┘
+                    │  HTTPS / JSON
+┌───────────────────▼──────────────────────┐
+│  Presentation Layer  ·  React            │
+└───────────────────┬──────────────────────┘
+                    │  REST API
+┌───────────────────▼──────────────────────┐
+│  Application Layer  ·  Node + Express    │
+│  JWT auth · Role guard · Business logic  │
+└─────────┬─────────────────────┬──────────┘
+          │                     │
+┌─────────▼─────────┐  ┌────────▼─────────┐
+│  MongoDB          │  │  File Storage    │
+│  (Mongoose ODM)   │  │  (Image uploads) │
+└───────────────────┘  └──────────────────┘
+```
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v18+)
-- npm
+
+- [Node.js](https://nodejs.org/) v18 or later
+- [Git](https://git-scm.com/)
+- A [MongoDB](https://www.mongodb.com/) database (local or Atlas)
 
 ### Installation
+
 ```bash
-# Clone the repository
-git clone https://github.com/madhu2007-offical/Trash-To-Treasure.git
+# 1. Clone the repository
+git clone https://github.com/<your-username>/<your-repo>.git
+cd <your-repo>
 
-# Navigate to project directory
-cd Trash-To-Treasure
-
-# Install dependencies
+# 2. Install backend dependencies
+cd server
 npm install
 
-# Start development server
-npm run dev
+# 3. Install frontend dependencies
+cd ../client
+npm install
 ```
 
-### Production Build & Deployment
+### Run in development
+
 ```bash
-# Build for production
-npm run build
+# Terminal 1: start the API (http://localhost:5000)
+cd server
+npm run dev
 
-# Deploy to GitHub Pages
-npm run deploy
-
-# Deploy to Vercel
-npx vercel --prod --yes
+# Terminal 2: start the React app (http://localhost:3000)
+cd client
+npm start
 ```
 
----
+### Production build
+
+```bash
+cd client
+npm run build
+```
+
+## 🔐 Environment Variables
+
+Create a `.env` file inside `server/`:
+
+```env
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/trash-to-treasure
+JWT_SECRET=replace_with_a_long_random_string
+CLIENT_URL=http://localhost:3000
+```
+
+And, if needed, inside `client/`:
+
+```env
+REACT_APP_API_URL=http://localhost:5000/api
+```
+
+> ⚠️ Never commit `.env` files. Make sure `.env` is listed in `.gitignore`.
 
 ## 📁 Project Structure
 
+> Adjust this section to match your actual folders.
+
 ```
-Origins.Co/
-├── public/                 # Static assets & favicons (t2t-logo.jpg)
-├── src/
-│   ├── assets/             # Brand logos & imagery
-│   ├── components/
-│   │   ├── AuthView.jsx    # Authentication & OTP verification portal
-│   │   ├── AuthView.css
-│   │   ├── SplashScreen.jsx# Cinematic opening video animation
-│   │   └── SplashScreen.css
-│   ├── data/
-│   │   └── mockData.js     # Default artisans, products & stories
-│   ├── utils/
-│   │   └── storage.js      # LocalStorage persistence & migration
-│   ├── App.jsx             # Main router, header, feed, shop, dashboards
-│   ├── App.css
-│   ├── index.css           # Core theme variables & design tokens
-│   └── main.jsx
-├── vercel.json             # Vercel SPA routing rewrite configuration
-├── package.json
-└── vite.config.js
+trash-to-treasure/
+├── client/                  # React front end
+│   └── src/
+│       ├── components/      # ProjectCard, CommentBox, Navbar, SplashScreen ...
+│       ├── pages/           # Home, Explore, ProjectDetail, Dashboard ...
+│       └── context/         # AuthContext
+├── server/                  # Node + Express back end
+│   ├── models/              # User, Project, Product, Order, Comment
+│   ├── routes/              # auth, projects, products, orders, admin
+│   ├── middleware/          # auth, role, upload, errorHandler
+│   └── server.js
+├── docs/                    # Project report and diagrams
+└── README.md
 ```
+
+## 🔌 API Overview
+
+| Method | Endpoint | Access | Purpose |
+|---|---|---|---|
+| POST | `/api/auth/register` | Public | Create an account |
+| POST | `/api/auth/login` | Public | Log in and receive a token |
+| GET | `/api/projects` | Public | List and search projects |
+| GET | `/api/projects/:id` | Public | View a project story |
+| POST | `/api/projects` | Creator, Admin | Create a project |
+| POST | `/api/projects/:id/like` | Logged in | Like or unlike |
+| POST | `/api/projects/:id/comments` | Logged in | Add a comment |
+| GET | `/api/products` | Public | List approved products |
+| POST | `/api/orders` | Logged in | Place an order |
+| PATCH | `/api/orders/:id/status` | Creator | Update order status |
+| GET | `/api/admin/reports` | Admin | Summary reports |
+
+## 🗺️ Roadmap
+
+- [x] User, Creator and Admin modules
+- [x] Project stories (Material, Idea, Process, Result)
+- [x] Product listing and ordering
+- [x] Likes, comments and follows
+- [ ] 🤖 **AI-Powered Waste Scanner**: a smart craft recommender based on the type of waste in a photo
+- [ ] 🏆 **Gamification & Eco-Impact Points**: reward sustainable creativity
+- [ ] 💳 Online payment gateway (UPI / cards)
+- [ ] 📦 Delivery partner integration
+- [ ] 🌐 Multilingual support (including Tamil)
+- [ ] 📱 Native mobile app
+
+## 🌍 Impact
+
+| Dimension | Outcome |
+|---|---|
+| ♻️ **Environmental** | More reuse, less waste |
+| 🎨 **Creative** | More ideas, more skills |
+| 👥 **Social** | Creators, learners and community |
+| 💰 **Economic** | Create, showcase and sell |
+
+## 🤝 Contributing
+
+Contributions, issues and feature requests are welcome.
+
+1. Fork the project
+2. Create your feature branch: `git checkout -b feature/amazing-feature`
+3. Commit your changes: `git commit -m "Add amazing feature"`
+4. Push to the branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+## 👩‍💻 Author
+
+**P. Dhakshakanya**
+B.Sc. Computer Technology, Nandha Arts and Science College (Autonomous), Erode
+Affiliated to Bharathiar University, Coimbatore
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for details.
 
 ---
 
-## 📄 License
-This project is open-source under the [MIT License](LICENSE).
+<div align="center">
+
+*"Don't see waste as garbage. See it as a possibility."*
+
+**Trash to Treasure** · Transform Waste. Create Treasure. ♻️
+
+</div>
