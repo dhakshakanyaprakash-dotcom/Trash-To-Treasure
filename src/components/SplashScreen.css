@@ -1,0 +1,331 @@
+/* ==========================================================================
+   T2T (TRASH TO TREASURE) CINEMATIC SPLASH SCREEN STYLES
+   ========================================================================== */
+
+:root {
+  --splash-cream: #F6F1E7;
+  --splash-sage: #7A9A6B;
+  --splash-forest: #2F5D3A;
+  --splash-terracotta: #C8643C;
+  --splash-mustard: #E2A93B;
+  --splash-charcoal: #2B2B2B;
+  --splash-gold: #E8B923;
+  --splash-gold-glow: rgba(232, 185, 35, 0.45);
+}
+
+/* Fullscreen Overlay Container */
+.splash-fullscreen-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  background-color: var(--splash-cream);
+  overflow: hidden;
+  user-select: none;
+  font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
+}
+
+.splash-fullscreen-container.phase-reveal {
+  pointer-events: none;
+}
+
+/* Screen Reader Accessible Status */
+.splash-sr-status,
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ==========================================================================
+   CINEMATIC CURTAIN DOORS (Phase 5 Reveal: 3.3s - 4.0s)
+   ========================================================================== */
+.splash-curtain-door {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.5%; /* slight overlap prevents subpixel seam */
+  height: 100%;
+  background-color: var(--splash-cream);
+  z-index: 4;
+  will-change: transform;
+}
+
+.splash-door-left {
+  left: 0;
+  box-shadow: 4px 0 25px rgba(43, 43, 43, 0.08);
+  border-right: 1px dashed rgba(200, 100, 60, 0.15);
+}
+
+.splash-door-right {
+  right: 0;
+  box-shadow: -4px 0 25px rgba(43, 43, 43, 0.08);
+  border-left: 1px dashed rgba(200, 100, 60, 0.15);
+}
+
+/* Main Animation Stage */
+.splash-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 8;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   WASTE VORTEX FIELD (Phase 1 & Phase 2)
+   ========================================================================== */
+.waste-vortex-field {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.waste-item-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -28px;
+  margin-left: -24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 4px 10px rgba(43, 43, 43, 0.12));
+}
+
+.waste-svg {
+  display: block;
+  overflow: visible;
+  transition: filter 0.2s ease;
+}
+
+/* ==========================================================================
+   TREASURE CENTER STAGE (Phase 3 & Phase 4: 2.0s - 3.3s)
+   ========================================================================== */
+.treasure-center-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 10;
+  pointer-events: auto;
+  padding: 1.5rem;
+  will-change: transform, opacity;
+}
+
+.treasure-mark-wrapper {
+  position: relative;
+  z-index: 5;
+  cursor: pointer;
+  filter: drop-shadow(0 8px 24px rgba(200, 100, 60, 0.25));
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.treasure-emblem-svg {
+  display: block;
+  overflow: visible;
+}
+
+/* Golden Aura Glow Pulse */
+.treasure-glow-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 240px;
+  height: 240px;
+  margin-top: -120px;
+  margin-left: -120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232, 185, 35, 0.45) 0%, rgba(200, 100, 60, 0.2) 48%, transparent 72%);
+  z-index: 1;
+  pointer-events: none;
+  filter: blur(8px);
+}
+
+/* Expanding Golden Ripple Wave */
+.treasure-ripple-wave {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160px;
+  height: 160px;
+  margin-top: -80px;
+  margin-left: -80px;
+  border-radius: 50%;
+  border: 2px dashed var(--splash-gold);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Sparkle Burst Particles */
+.sparkle-burst-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  z-index: 8;
+  pointer-events: none;
+}
+
+.sparkle-particle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-top: -8px;
+  margin-left: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--splash-gold);
+  font-size: 1.2rem;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(232, 185, 35, 0.9);
+  will-change: transform, opacity;
+  background: transparent !important; /* render text glyph directly */
+}
+
+/* ==========================================================================
+   TYPOGRAPHY WORDMARK & TAGLINE (Phase 4: 2.6s - 3.3s)
+   ========================================================================== */
+.splash-typography-block {
+  margin-top: 1.25rem;
+  z-index: 6;
+}
+
+.splash-wordmark {
+  font-family: var(--font-serif, 'Playfair Display', Georgia, serif);
+  font-size: clamp(2rem, 5.2vw, 3.4rem);
+  font-weight: 700;
+  color: var(--splash-charcoal);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(43, 43, 43, 0.05);
+}
+
+.splash-tagline {
+  font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
+  font-size: clamp(0.75rem, 1.8vw, 0.92rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--splash-terracotta);
+  margin: 0.45rem 0 0 0;
+}
+
+/* Prefers-Reduced-Motion View */
+.splash-reduced-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* ==========================================================================
+   CONTROLS: AUDIO TOGGLE & SKIP BUTTON (Bottom-Right)
+   ========================================================================== */
+.splash-bottom-controls {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  z-index: 20;
+  pointer-events: auto;
+}
+
+.splash-control-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(43, 43, 43, 0.15);
+  color: var(--splash-charcoal);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.45rem 0.9rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.splash-control-btn:hover {
+  background: #FFFFFF;
+  color: var(--splash-terracotta);
+  border-color: var(--splash-terracotta);
+  box-shadow: 0 4px 14px rgba(200, 100, 60, 0.18);
+  transform: translateY(-1px);
+}
+
+.splash-control-btn:active {
+  transform: translateY(0);
+}
+
+.splash-control-btn:focus-visible {
+  outline: 2px solid var(--splash-terracotta);
+  outline-offset: 2px;
+}
+
+.splash-sound-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.splash-skip-btn .skip-arrow {
+  font-size: 0.85rem;
+  transition: transform 0.2s ease;
+}
+
+.splash-skip-btn:hover .skip-arrow {
+  transform: translateX(2px);
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVENESS (Down to 360px)
+   ========================================================================== */
+@media (max-width: 600px) {
+  .splash-wordmark {
+    font-size: 1.85rem;
+  }
+  .splash-tagline {
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+  }
+  .treasure-emblem-svg {
+    width: 105px;
+    height: 105px;
+  }
+  .splash-bottom-controls {
+    bottom: 1rem;
+    right: 1rem;
+  }
+  .splash-control-btn {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.76rem;
+  }
+}

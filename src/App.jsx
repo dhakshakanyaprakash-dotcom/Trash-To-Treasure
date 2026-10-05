@@ -31,6 +31,7 @@ import {
 import './App.css';
 import AuthView from './components/AuthView';
 import t2tLogo from './assets/t2t-logo.jpg';
+import SplashScreen from './components/SplashScreen';
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&h=600&fit=crop&q=80';
 
@@ -44,6 +45,23 @@ function App() {
   // Navigation & Router
   const [view, setView] = useState({ name: 'feed', params: null });
   const [currentUser, setCurrentUser] = useState(null);
+  
+  // Cinematic Opening Splash State (once per session)
+  const [showSplash, setShowSplash] = useState(() => {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      return !sessionStorage.getItem('t2t_splash_seen');
+    }
+    return true;
+  });
+
+  useEffect(() => {
+    window.__replayT2TSplash = () => {
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        sessionStorage.removeItem('t2t_splash_seen');
+      }
+      setShowSplash(true);
+    };
+  }, []);
   
   // Data States (loaded from localStorage on mount & changes)
   const [artisans, setArtisans] = useState([]);
@@ -518,6 +536,11 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* Cinematic Opening Splash Animation (Preloads app behind overlay) */}
+      {showSplash && (
+        <SplashScreen onComplete={() => setShowSplash(false)} />
+      )}
+
       {/* Header Chrome (Quiet & Clean) */}
       <header className="main-header">
         <div className="container header-inner">
@@ -2147,6 +2170,7 @@ function App() {
             <span>&copy; {new Date().getFullYear()} T2T (Trash to Treasure). All rights reserved.</span>
           </div>
           <div className="footer-links">
+            <a href="#replay-intro" onClick={(e) => { e.preventDefault(); if (typeof window !== 'undefined' && window.__replayT2TSplash) { window.__replayT2TSplash(); } }}>Replay Intro 🎬</a>
             <a href="#about" onClick={(e) => { e.preventDefault(); alert("T2T (Trash to Treasure) connects patrons directly with regional artisans who transform discarded and reclaimed materials into handcrafted treasures with verified provenance."); }}>About T2T</a>
             <a href="#standards" onClick={(e) => { e.preventDefault(); alert("Our standards ensure fair compensation, authentic material upcycling, zero-waste practices, and fully traceable supply chains."); }}>Verification Standards</a>
           </div>
