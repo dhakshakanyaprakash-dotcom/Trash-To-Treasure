@@ -32,6 +32,7 @@ import './App.css';
 import AuthView from './components/AuthView';
 import t2tLogo from './assets/t2t-logo.jpg';
 import SplashScreen from './components/SplashScreen';
+import CameraModal from './components/CameraModal';
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&h=600&fit=crop&q=80';
 
@@ -93,6 +94,29 @@ function App() {
   const [checkoutNotes, setCheckoutNotes] = useState('');
   const [checkoutImage, setCheckoutImage] = useState('');
   
+  // Camera Viewfinder Modal State
+  const [cameraModalConfig, setCameraModalConfig] = useState({
+    isOpen: false,
+    target: null, // 'checkout' | 'orderEdit' | 'productImage1' | 'productImage2' | 'postMedia' | 'reviewImage'
+    title: 'Capture Scrap Material Photo'
+  });
+
+  const handleCameraCapture = (dataUrl) => {
+    if (cameraModalConfig.target === 'checkout') {
+      setCheckoutImage(dataUrl);
+    } else if (cameraModalConfig.target === 'orderEdit') {
+      setEditOrderImage(dataUrl);
+    } else if (cameraModalConfig.target === 'productImage1') {
+      setNewProduct(prev => ({ ...prev, image1: dataUrl }));
+    } else if (cameraModalConfig.target === 'productImage2') {
+      setNewProduct(prev => ({ ...prev, image2: dataUrl }));
+    } else if (cameraModalConfig.target === 'postMedia') {
+      setNewPost(prev => ({ ...prev, mediaUrl: dataUrl }));
+    } else if (cameraModalConfig.target === 'reviewImage') {
+      setReviewImage(dataUrl);
+    }
+  };
+
   // Artisan Form States
   const [newProduct, setNewProduct] = useState({
     title: '', description: '', price: '', stock: '', category: 'Pottery',
@@ -540,6 +564,14 @@ function App() {
       {showSplash && (
         <SplashScreen onComplete={() => setShowSplash(false)} />
       )}
+
+      {/* Live Camera Viewfinder Modal */}
+      <CameraModal
+        isOpen={cameraModalConfig.isOpen}
+        title={cameraModalConfig.title}
+        onClose={() => setCameraModalConfig(prev => ({ ...prev, isOpen: false }))}
+        onCapture={handleCameraCapture}
+      />
 
       {/* Header Chrome (Quiet & Clean) */}
       <header className="main-header">
@@ -1258,10 +1290,23 @@ function App() {
                         <div className="form-group">
                           <label>Attach Scrap Material or Reference Photo</label>
                           <div className="order-photo-uploader-box">
-                            <div className="order-photo-upload-actions">
-                              <label className="btn btn-secondary btn-small file-input-label">
-                                <Upload size={14} />
-                                <span>Upload Photo from Device</span>
+                            <div className="order-photo-actions-row">
+                              <button
+                                type="button"
+                                className="btn btn-primary btn-camera-trigger"
+                                onClick={() => setCameraModalConfig({
+                                  isOpen: true,
+                                  target: 'checkout',
+                                  title: 'Capture Scrap Material Photo'
+                                })}
+                              >
+                                <Camera size={16} />
+                                <span>Take Photo (Camera)</span>
+                              </button>
+
+                              <label className="btn btn-secondary file-input-label">
+                                <Upload size={16} />
+                                <span>Upload from Device</span>
                                 <input 
                                   type="file" 
                                   accept="image/*" 
@@ -1269,16 +1314,7 @@ function App() {
                                   style={{ display: 'none' }}
                                 />
                               </label>
-                              <span className="uploader-or-separator">or paste image URL</span>
                             </div>
-
-                            <input 
-                              type="url"
-                              placeholder="https://... or upload photo above"
-                              value={checkoutImage}
-                              onChange={(e) => setCheckoutImage(e.target.value)}
-                              className="order-photo-url-input"
-                            />
 
                             {checkoutImage && (
                               <div className="order-photo-preview-card">
@@ -1290,14 +1326,28 @@ function App() {
                                 />
                                 <div className="order-photo-preview-info">
                                   <span className="preview-label"><Check size={13} /> Photo attached to order</span>
-                                  <button 
-                                    type="button" 
-                                    className="btn-text btn-small remove-photo-btn"
-                                    onClick={() => setCheckoutImage('')}
-                                  >
-                                    <X size={13} />
-                                    <span>Remove</span>
-                                  </button>
+                                  <div className="preview-action-btns">
+                                    <button 
+                                      type="button" 
+                                      className="btn-text btn-small retake-photo-btn"
+                                      onClick={() => setCameraModalConfig({
+                                        isOpen: true,
+                                        target: 'checkout',
+                                        title: 'Retake Scrap Material Photo'
+                                      })}
+                                    >
+                                      <Camera size={13} />
+                                      <span>Retake</span>
+                                    </button>
+                                    <button 
+                                      type="button" 
+                                      className="btn-text btn-small remove-photo-btn"
+                                      onClick={() => setCheckoutImage('')}
+                                    >
+                                      <X size={13} />
+                                      <span>Remove</span>
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
                             )}
@@ -1496,10 +1546,23 @@ function App() {
                               <div className="form-group">
                                 <label>Attached Photo (Scrap Material / Design Reference)</label>
                                 <div className="order-photo-uploader-box">
-                                  <div className="order-photo-upload-actions">
-                                    <label className="btn btn-secondary btn-small file-input-label">
-                                      <Upload size={14} />
-                                      <span>Upload Photo from Device</span>
+                                  <div className="order-photo-actions-row">
+                                    <button
+                                      type="button"
+                                      className="btn btn-primary btn-camera-trigger"
+                                      onClick={() => setCameraModalConfig({
+                                        isOpen: true,
+                                        target: 'orderEdit',
+                                        title: `Take Photo for Order #${order.id.split('_')[1]}`
+                                      })}
+                                    >
+                                      <Camera size={16} />
+                                      <span>Take Photo (Camera)</span>
+                                    </button>
+
+                                    <label className="btn btn-secondary file-input-label">
+                                      <Upload size={16} />
+                                      <span>Upload from Device</span>
                                       <input 
                                         type="file" 
                                         accept="image/*" 
@@ -1507,16 +1570,7 @@ function App() {
                                         style={{ display: 'none' }}
                                       />
                                     </label>
-                                    <span className="uploader-or-separator">or paste web URL below</span>
                                   </div>
-
-                                  <input 
-                                    type="url"
-                                    placeholder="https://... or upload photo above"
-                                    value={editOrderImage}
-                                    onChange={(e) => setEditOrderImage(e.target.value)}
-                                    className="order-photo-url-input"
-                                  />
 
                                   {editOrderImage && (
                                     <div className="order-photo-preview-card">
@@ -1528,14 +1582,28 @@ function App() {
                                       />
                                       <div className="order-photo-preview-info">
                                         <span className="preview-label"><Check size={13} /> Photo ready to attach</span>
-                                        <button 
-                                          type="button" 
-                                          className="btn-text btn-small remove-photo-btn"
-                                          onClick={() => setEditOrderImage('')}
-                                        >
-                                          <X size={13} />
-                                          <span>Remove</span>
-                                        </button>
+                                        <div className="preview-action-btns">
+                                          <button
+                                            type="button"
+                                            className="btn-text btn-small retake-photo-btn"
+                                            onClick={() => setCameraModalConfig({
+                                              isOpen: true,
+                                              target: 'orderEdit',
+                                              title: `Retake Photo for Order #${order.id.split('_')[1]}`
+                                            })}
+                                          >
+                                            <Camera size={13} />
+                                            <span>Retake</span>
+                                          </button>
+                                          <button 
+                                            type="button" 
+                                            className="btn-text btn-small remove-photo-btn"
+                                            onClick={() => setEditOrderImage('')}
+                                          >
+                                            <X size={13} />
+                                            <span>Remove</span>
+                                          </button>
+                                        </div>
                                       </div>
                                     </div>
                                   )}
@@ -1586,13 +1654,68 @@ function App() {
                                 ></textarea>
                               </div>
                               <div className="form-group">
-                                <label>Optional Snapshot Link</label>
-                                <input 
-                                  type="url"
-                                  placeholder="Unsplash / image url for review image..."
-                                  value={reviewImage}
-                                  onChange={(e) => setReviewImage(e.target.value)}
-                                />
+                                <label>Snapshot of Received Treasure (Optional)</label>
+                                <div className="order-photo-actions-row">
+                                  <button
+                                    type="button"
+                                    className="btn btn-secondary btn-small"
+                                    onClick={() => setCameraModalConfig({
+                                      isOpen: true,
+                                      target: 'reviewImage',
+                                      title: 'Snap Photo of Your Received Piece'
+                                    })}
+                                  >
+                                    <Camera size={14} />
+                                    <span>Take Photo (Camera)</span>
+                                  </button>
+                                  <label className="btn btn-secondary btn-small file-input-label">
+                                    <Upload size={14} />
+                                    <span>Upload Photo</span>
+                                    <input 
+                                      type="file" 
+                                      accept="image/*" 
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (!file) return;
+                                        const reader = new FileReader();
+                                        reader.onloadend = () => setReviewImage(reader.result);
+                                        reader.readAsDataURL(file);
+                                      }} 
+                                      style={{ display: 'none' }}
+                                    />
+                                  </label>
+                                </div>
+
+                                {reviewImage && (
+                                  <div className="order-photo-preview-card" style={{ marginTop: '0.4rem' }}>
+                                    <img src={reviewImage} alt="Review snapshot preview" className="order-photo-preview-img" onError={handleImageError} />
+                                    <div className="order-photo-preview-info">
+                                      <span className="preview-label"><Check size={13} /> Photo attached</span>
+                                      <div className="preview-action-btns">
+                                        <button
+                                          type="button"
+                                          className="btn-text btn-small retake-photo-btn"
+                                          onClick={() => setCameraModalConfig({
+                                            isOpen: true,
+                                            target: 'reviewImage',
+                                            title: 'Retake Photo of Your Received Piece'
+                                          })}
+                                        >
+                                          <Camera size={13} />
+                                          <span>Retake</span>
+                                        </button>
+                                        <button 
+                                          type="button" 
+                                          className="btn-text btn-small remove-photo-btn"
+                                          onClick={() => setReviewImage('')}
+                                        >
+                                          <X size={13} />
+                                          <span>Remove</span>
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                               <div className="form-actions-row">
                                 <button type="submit" className="btn btn-primary btn-small">Submit Appraisal</button>
@@ -1886,22 +2009,111 @@ function App() {
 
                     <div className="grid grid-cols-2 gap-md">
                       <div className="form-group">
-                        <label>Primary Image URL</label>
-                        <input 
-                          type="url" 
-                          placeholder="Unsplash url or equivalent..."
-                          value={newProduct.image1}
-                          onChange={(e) => setNewProduct({...newProduct, image1: e.target.value})}
-                        />
+                        <label>Primary Craft Photo (Camera / Upload / URL)</label>
+                        <div className="product-image-input-lockup">
+                          <div className="order-photo-actions-row" style={{ marginBottom: '0.4rem' }}>
+                            <button
+                              type="button"
+                              className="btn btn-secondary btn-small"
+                              onClick={() => setCameraModalConfig({
+                                isOpen: true,
+                                target: 'productImage1',
+                                title: 'Capture Primary Product Photo'
+                              })}
+                            >
+                              <Camera size={14} />
+                              <span>Camera</span>
+                            </button>
+                            <label className="btn btn-secondary btn-small file-input-label">
+                              <Upload size={14} />
+                              <span>Upload</span>
+                              <input 
+                                type="file" 
+                                accept="image/*" 
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (!file) return;
+                                  const reader = new FileReader();
+                                  reader.onloadend = () => setNewProduct(prev => ({ ...prev, image1: reader.result }));
+                                  reader.readAsDataURL(file);
+                                }} 
+                                style={{ display: 'none' }}
+                              />
+                            </label>
+                          </div>
+                          <input 
+                            type="text" 
+                            placeholder="Use Camera / Upload above or enter image URL..."
+                            value={newProduct.image1}
+                            onChange={(e) => setNewProduct({...newProduct, image1: e.target.value})}
+                          />
+                          {newProduct.image1 && (
+                            <div className="order-photo-preview-card" style={{ marginTop: '0.4rem' }}>
+                              <img src={newProduct.image1} alt="Primary preview" className="order-photo-preview-img" onError={handleImageError} />
+                              <div className="order-photo-preview-info">
+                                <span className="preview-label"><Check size={13} /> Photo ready</span>
+                                <button type="button" className="btn-text btn-small remove-photo-btn" onClick={() => setNewProduct({...newProduct, image1: ''})}>
+                                  <X size={13} />
+                                  <span>Remove</span>
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
+
                       <div className="form-group">
-                        <label>Secondary Image URL</label>
-                        <input 
-                          type="url" 
-                          placeholder="Unsplash url or equivalent..."
-                          value={newProduct.image2}
-                          onChange={(e) => setNewProduct({...newProduct, image2: e.target.value})}
-                        />
+                        <label>Secondary Craft Photo (Camera / Upload / URL)</label>
+                        <div className="product-image-input-lockup">
+                          <div className="order-photo-actions-row" style={{ marginBottom: '0.4rem' }}>
+                            <button
+                              type="button"
+                              className="btn btn-secondary btn-small"
+                              onClick={() => setCameraModalConfig({
+                                isOpen: true,
+                                target: 'productImage2',
+                                title: 'Capture Secondary Product Photo'
+                              })}
+                            >
+                              <Camera size={14} />
+                              <span>Camera</span>
+                            </button>
+                            <label className="btn btn-secondary btn-small file-input-label">
+                              <Upload size={14} />
+                              <span>Upload</span>
+                              <input 
+                                type="file" 
+                                accept="image/*" 
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (!file) return;
+                                  const reader = new FileReader();
+                                  reader.onloadend = () => setNewProduct(prev => ({ ...prev, image2: reader.result }));
+                                  reader.readAsDataURL(file);
+                                }} 
+                                style={{ display: 'none' }}
+                              />
+                            </label>
+                          </div>
+                          <input 
+                            type="text" 
+                            placeholder="Use Camera / Upload above or enter image URL..."
+                            value={newProduct.image2}
+                            onChange={(e) => setNewProduct({...newProduct, image2: e.target.value})}
+                          />
+                          {newProduct.image2 && (
+                            <div className="order-photo-preview-card" style={{ marginTop: '0.4rem' }}>
+                              <img src={newProduct.image2} alt="Secondary preview" className="order-photo-preview-img" onError={handleImageError} />
+                              <div className="order-photo-preview-info">
+                                <span className="preview-label"><Check size={13} /> Photo ready</span>
+                                <button type="button" className="btn-text btn-small remove-photo-btn" onClick={() => setNewProduct({...newProduct, image2: ''})}>
+                                  <X size={13} />
+                                  <span>Remove</span>
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
 
@@ -1953,13 +2165,57 @@ function App() {
                     </div>
 
                     <div className="form-group">
-                      <label>Story Cover Image URL</label>
-                      <input 
-                        type="url" 
-                        placeholder="Unsplash image URL..."
-                        value={newPost.mediaUrl}
-                        onChange={(e) => setNewPost({...newPost, mediaUrl: e.target.value})}
-                      />
+                      <label>Story Cover Photo (Camera / Upload / Link)</label>
+                      <div className="product-image-input-lockup">
+                        <div className="order-photo-actions-row" style={{ marginBottom: '0.4rem' }}>
+                          <button
+                            type="button"
+                            className="btn btn-secondary btn-small"
+                            onClick={() => setCameraModalConfig({
+                              isOpen: true,
+                              target: 'postMedia',
+                              title: 'Capture Story Cover Photo'
+                            })}
+                          >
+                            <Camera size={14} />
+                            <span>Camera</span>
+                          </button>
+                          <label className="btn btn-secondary btn-small file-input-label">
+                            <Upload size={14} />
+                            <span>Upload</span>
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                const reader = new FileReader();
+                                reader.onloadend = () => setNewPost(prev => ({ ...prev, mediaUrl: reader.result }));
+                                reader.readAsDataURL(file);
+                              }} 
+                              style={{ display: 'none' }}
+                            />
+                          </label>
+                        </div>
+                        <input 
+                          type="text" 
+                          placeholder="Use Camera / Upload above or enter link..."
+                          value={newPost.mediaUrl}
+                          onChange={(e) => setNewPost({...newPost, mediaUrl: e.target.value})}
+                        />
+                        {newPost.mediaUrl && (
+                          <div className="order-photo-preview-card" style={{ marginTop: '0.4rem' }}>
+                            <img src={newPost.mediaUrl} alt="Story cover preview" className="order-photo-preview-img" onError={handleImageError} />
+                            <div className="order-photo-preview-info">
+                              <span className="preview-label"><Check size={13} /> Story cover ready</span>
+                              <button type="button" className="btn-text btn-small remove-photo-btn" onClick={() => setNewPost({...newPost, mediaUrl: ''})}>
+                                <X size={13} />
+                                <span>Remove</span>
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <div className="form-group">
