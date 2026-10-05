@@ -2,7 +2,7 @@
 ### *Upcycled Handcrafted Living*
 
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Live-success?logo=vercel&style=flat-square)](https://trash-to-treasure.vercel.app)
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-blue?logo=github&style=flat-square)](https://madhu2007-offical.github.io/Origins.Co/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-blue?logo=github&style=flat-square)](https://madhu2007-offical.github.io/Trash-To-Treasure/)
 [![React](https://img.shields.io/badge/React-19.2-61dafb?logo=react&style=flat-square)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-8.2-646cff?logo=vite&style=flat-square)](https://vitejs.dev/)
 
@@ -16,7 +16,7 @@ An upcycling social-commerce platform connecting conscious patrons directly with
 | :--- | :--- | :---: |
 | **Vercel (Primary)** | [https://trash-to-treasure.vercel.app](https://trash-to-treasure.vercel.app) | 🟢 Active |
 | **Vercel (Secondary)** | [https://t2t-trash-to-treasure.vercel.app](https://t2t-trash-to-treasure.vercel.app) | 🟢 Active |
-| **GitHub Pages Mirror** | [https://madhu2007-offical.github.io/Origins.Co/](https://madhu2007-offical.github.io/Origins.Co/) | 🟢 Active |
+| **GitHub Pages** | [https://madhu2007-offical.github.io/Trash-To-Treasure/](https://madhu2007-offical.github.io/Trash-To-Treasure/) | 🟢 Active |
 
 ---
 
@@ -69,10 +69,10 @@ An upcycling social-commerce platform connecting conscious patrons directly with
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/madhu2007-offical/Origins.Co.git
+git clone https://github.com/madhu2007-offical/Trash-To-Treasure.git
 
 # Navigate to project directory
-cd Origins.Co
+cd Trash-To-Treasure
 
 # Install dependencies
 npm install
