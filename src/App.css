@@ -24,6 +24,22 @@
   align-items: center;
   gap: var(--space-sm);
   cursor: pointer;
+  text-decoration: none;
+}
+
+.header-logo-image {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--border-radius-sm);
+  object-fit: cover;
+  border: 1.5px solid var(--color-border-light);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.logo-section:hover .header-logo-image {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .logo-mark {
@@ -627,6 +643,44 @@
   padding-bottom: var(--space-xs);
 }
 
+.sidebar-brand-showcase {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.sidebar-brand-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--border-radius-sm);
+  object-fit: cover;
+  border: 1.5px solid var(--color-border-light);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-brand-title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-clay);
+  line-height: 1.1;
+}
+
+.sidebar-brand-tagline {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-charcoal-muted);
+}
+
 .welcome-widget p {
   font-size: 0.9rem;
   color: var(--color-charcoal-muted);
@@ -1032,9 +1086,9 @@
 }
 
 .qr-img-mock {
-  width: 42px;
-  height: 42px;
-  border: 2px solid var(--color-charcoal);
+  width: 48px;
+  height: 48px;
+  border: 1.5px solid var(--color-charcoal);
   border-radius: var(--border-radius-sm);
   display: flex;
   flex-direction: column;
@@ -1042,6 +1096,14 @@
   justify-content: center;
   position: relative;
   background-color: white;
+  padding: 2px;
+}
+
+.qr-t2t-logo-img {
+  width: 30px;
+  height: 30px;
+  border-radius: 3px;
+  object-fit: cover;
 }
 
 .qr-cube {
@@ -1054,10 +1116,10 @@
 }
 
 .qr-text {
-  font-size: 0.35rem;
+  font-size: 0.38rem;
   font-weight: 700;
-  margin-top: 20px;
-  letter-spacing: -0.01em;
+  margin-top: 2px;
+  letter-spacing: 0.02em;
   color: var(--color-charcoal);
 }
 
@@ -2620,10 +2682,26 @@
   text-align: left;
 }
 
+.footer-brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.footer-logo-image {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--border-radius-sm);
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
 .footer-copyright h4 {
   font-size: 1.25rem;
   color: var(--color-cream);
-  margin-bottom: var(--space-xs);
+  margin-bottom: 2px;
 }
 
 .footer-copyright p {

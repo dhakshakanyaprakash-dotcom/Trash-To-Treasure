@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import './App.css';
 import AuthView from './components/AuthView';
+import t2tLogo from './assets/t2t-logo.jpg';
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&h=600&fit=crop&q=80';
 
@@ -521,7 +522,7 @@ function App() {
       <header className="main-header">
         <div className="container header-inner">
           <div className="logo-section" onClick={() => setView({ name: 'feed', params: null })}>
-            <span className="logo-mark" style={{ fontSize: '0.85rem', fontWeight: 800, letterSpacing: '0.5px' }}>T2T</span>
+            <img src={t2tLogo} alt="T2T - Trash to Treasure" className="header-logo-image" />
             <div className="logo-text-group">
               <h1 className="logo-title">T2T</h1>
               <span className="logo-tagline">Trash to Treasure</span>
@@ -844,6 +845,13 @@ function App() {
               {/* Feed Sidebar (Quiet Showcase) */}
               <aside className="feed-sidebar">
                 <div className="sidebar-widget welcome-widget">
+                  <div className="sidebar-brand-showcase">
+                    <img src={t2tLogo} alt="T2T - Trash to Treasure" className="sidebar-brand-logo" />
+                    <div className="sidebar-brand-text">
+                      <span className="sidebar-brand-title">T2T</span>
+                      <span className="sidebar-brand-tagline">Trash to Treasure</span>
+                    </div>
+                  </div>
                   <h3>Our Philosophy</h3>
                   <p>Every reclaimed timber cut, salvaged textile scrap, and riverbed silt holds a renewed life. T2T (Trash to Treasure) ensures full provenance traceability directly from the upcycling creator's hands to yours.</p>
                 </div>
@@ -1018,8 +1026,7 @@ function App() {
                       
                       <div className="simulated-qr-box">
                         <div className="qr-img-mock">
-                          {/* Quick visual grid representing QR */}
-                          <div className="qr-cube"></div>
+                          <img src={t2tLogo} alt="T2T Verified" className="qr-t2t-logo-img" />
                           <div className="qr-text">T2T VERIFIED</div>
                         </div>
                         <div className="qr-details">
@@ -2130,8 +2137,13 @@ function App() {
       <footer className="main-footer">
         <div className="container footer-inner">
           <div className="footer-copyright">
-            <h4>T2T</h4>
-            <p>Trash to Treasure — Upcycled with Craft and Purpose.</p>
+            <div className="footer-brand-lockup">
+              <img src={t2tLogo} alt="T2T - Trash to Treasure" className="footer-logo-image" />
+              <div>
+                <h4>T2T</h4>
+                <p>Trash to Treasure — Upcycled with Craft and Purpose.</p>
+              </div>
+            </div>
             <span>&copy; {new Date().getFullYear()} T2T (Trash to Treasure). All rights reserved.</span>
           </div>
           <div className="footer-links">

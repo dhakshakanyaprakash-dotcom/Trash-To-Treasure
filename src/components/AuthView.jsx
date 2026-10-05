@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { storage } from '../utils/storage';
 import './AuthView.css';
+import t2tLogo from '../assets/t2t-logo.jpg';
 
 export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab = 'signin', bannerMessage = '' }) {
   // Navigation / Step: 'form' | 'otp'
@@ -405,8 +406,9 @@ export default function AuthView({ onLoginSuccess, onGuestContinue, initialTab =
           <>
             {/* Header */}
             <div className="auth-header">
-              <div className="auth-logo-badge" style={{ fontSize: '0.85rem', fontWeight: 800 }}>T2T</div>
+              <img src={t2tLogo} alt="T2T - Trash to Treasure" className="auth-brand-logo" />
               <h2>T2T</h2>
+              <span className="auth-tagline-text">Trash to Treasure &bull; Upcycled Handcrafted Living</span>
               <p>
                 {activeTab === 'signin' 
                   ? 'Sign in to reconnect with upcycled crafts & Trash to Treasure chronicles'

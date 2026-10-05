@@ -38,6 +38,33 @@
   margin-bottom: 1.5rem;
 }
 
+.auth-brand-logo {
+  display: block;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 0.75rem auto;
+  border-radius: var(--border-radius-md, 8px);
+  object-fit: cover;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1.5px solid var(--color-border-light);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.auth-brand-logo:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.auth-tagline-text {
+  display: block;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-terracotta);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
 .auth-logo-badge {
   display: inline-flex;
   align-items: center;
@@ -58,7 +85,7 @@
   font-family: var(--font-serif);
   color: var(--color-clay);
   font-size: 1.75rem;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.2rem;
 }
 
 .auth-header p {
